@@ -1,3 +1,6 @@
+#ifndef R_RAIN_H
+#define R_RAIN_H
+
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -10,10 +13,6 @@
 #define TYPE_TABLE 5
 #define TYPE_FUNC  6
 #define TYPE_CDATA 7
-
-// op codes
-#define LOAD_CONST 0
-#define PRINT_ITEM 1
 
 typedef union {
   unsigned long ui;
@@ -50,11 +49,10 @@ typedef struct R_vm {
 void box_print(R_box *val);
 void op_print(R_op *instr);
 
-void R_PRINT_ITEM(R_vm *this);
-void R_LOAD_CONST(R_vm *this, char idx);
-
 R_vm *vm_load(FILE *fp);
 bool vm_exec(R_vm *this, R_op *instr);
 bool vm_step(R_vm *this);
 bool vm_run(R_vm *this);
 void vm_dump(R_vm *this);
+
+#endif

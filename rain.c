@@ -1,4 +1,5 @@
 #include "rain.h"
+#include "instr.h"
 #include <gc.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -76,16 +77,6 @@ R_vm *vm_load(FILE *fp) {
   }
 
   return this;
-}
-
-void R_PRINT_ITEM(R_vm *this) {
-  R_box *val = this->stack + this->stack_ptr - 1;
-  box_print(val);
-}
-
-void R_LOAD_CONST(R_vm *this, char idx) {
-  this->stack[this->stack_ptr] = this->consts[idx];
-  this->stack_ptr += 1;
 }
 
 bool vm_exec(R_vm *this, R_op *instr) {
