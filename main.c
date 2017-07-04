@@ -30,7 +30,8 @@ typedef struct R_box {
 #define PRINT_ITEM 1
 
 typedef struct R_op {
-  char code[4];
+  char op;
+  char args[3];
 } R_op;
 
 typedef struct R_vm {
@@ -120,15 +121,43 @@ R_vm *vm_load(FILE *fp) {
   return this;
 }
 
+void R_PRINT_ITEM(R_vm *this) {
+  R_box *val = this->stack + this->stack_ptr - 1;
+  box_print(val);
+}
+
+void R_LOAD_CONST(R_vm *this, char idx) {
+  this->stack[this->stack_ptr] = this->consts[idx];
+  this->stack_ptr += 1;
+}
+
 bool vm_exec(R_vm *this, R_op *instr) {
-  printf("Execute instruction");
+  switch(instr->op) {
+    case LOAD_CONST:
+      R_LOAD_CONST(this, instr->args[0]);
+      break;
+    case PRINT_ITEM:
+      R_PRINT_ITEM(this);
+      break;
+    default:
+      printf("Unknown instruction %d %d %d %d\n", instr->op, instr->args[0], instr->args[1], instr->args[2]);
+  }
+
+  return true;
+}
+
+bool vm_step(R_vm *this) {
+  if(this->instr_ptr < this->num_instrs) {
+    vm_exec(this, this->instrs + this->instr_ptr);
+    this->instr_ptr += 1;
+  }
+
   return true;
 }
 
 bool vm_run(R_vm *this) {
   while(this->instr_ptr < this->num_instrs) {
-    vm_exec(this, this->instrs + this->instr_ptr);
-    this->instr_ptr += 1;
+    vm_step(this);
   }
 
   return true;
