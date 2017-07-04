@@ -2,6 +2,15 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define TYPE_NULL  0
+#define TYPE_INT   1
+#define TYPE_FLOAT 2
+#define TYPE_BOOL  3
+#define TYPE_STR   4
+#define TYPE_TABLE 5
+#define TYPE_FUNC  6
+#define TYPE_CDATA 7
+
 typedef union {
   unsigned long ui;
   signed long si;
@@ -16,6 +25,9 @@ typedef struct R_box {
   R_cast data;
   struct R_box *meta;
 } R_box;
+
+#define LOAD_CONST 0
+#define PRINT_ITEM 1
 
 typedef struct R_op {
   char code[4];
