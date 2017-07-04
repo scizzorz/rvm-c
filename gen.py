@@ -82,8 +82,8 @@ class Module:
         fp.write(instr)
 
 consts = [
-  Box(10),
-  Box(12),
+  Box.to_rain(10),
+  Box.to_rain(12),
 ]
 
 instrs = [
