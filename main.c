@@ -97,11 +97,25 @@ R_vm *vm_load(FILE *fp) {
     return NULL;
   }
 
-  printf("Consts: %d, instrs: %d\n", this->num_consts, this->num_instrs);
-
   this->instr_ptr = 0;
   this->stack_ptr = 0;
   this->stack_size = 10;
+
+  this->stack = GC_malloc(sizeof(R_box) * this->stack_size);
+  this->consts = GC_malloc(sizeof(R_box) * this->num_consts);
+  this->instrs = GC_malloc(sizeof(R_op) * this->num_instrs);
+
+  rv = fread(this->consts, sizeof(R_box), this->num_consts, fp);
+  if(rv != this->num_consts) {
+    fprintf(stderr, "Unable to read constants\n");
+    return NULL;
+  }
+
+  rv = fread(this->instrs, sizeof(R_op), this->num_instrs, fp);
+  if(rv != this->num_instrs) {
+    fprintf(stderr, "Unable to read instructions\n");
+    return NULL;
+  }
 
   return this;
 }
@@ -120,6 +134,26 @@ bool vm_run(R_vm *this) {
   return true;
 }
 
+void vm_dump(R_vm *this) {
+  printf("Constants (%d):\n", this->num_consts);
+  for(int i=0; i<this->num_consts; i++) {
+    printf("   ");
+    box_print(this->consts + i);
+  }
+
+  printf("Instructions (%d):\n", this->num_instrs);
+  for(int i=0; i<this->num_instrs; i++) {
+    printf(i == this->instr_ptr ? "-> " : "   ");
+    op_print(this->instrs + i);
+  }
+
+  printf("Stack (%d):\n", this->stack_size);
+  for(int i=0; i<this->stack_size; i++) {
+    printf(i == this->stack_ptr ? "-> " : "   ");
+    box_print(this->stack + i);
+  }
+}
+
 int main(int argv, char **argc) {
   if(argv < 2) {
     fprintf(stderr, "Usage: %s FILE\n", argc[0]);
@@ -134,6 +168,13 @@ int main(int argv, char **argc) {
   }
 
   R_vm *this = vm_load(fp);
+
+  if(this == NULL) {
+    fprintf(stderr, "Unable to load VM\n");
+    return 1;
+  }
+
+  vm_dump(this);
 
   return 0;
 }
