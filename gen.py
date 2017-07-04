@@ -60,8 +60,10 @@ class Op(ct.Structure):
               ('arg2', ct.c_uint8)]
 
   LOAD_CONST = 0
+  PRINT_ITEM = 1
 
 LOAD_CONST = lambda x: Op(Op.LOAD_CONST, x, 0, 0)
+PRINT_ITEM = Op(Op.PRINT_ITEM, 0, 0, 0)
 
 
 class Module:
@@ -89,6 +91,7 @@ consts = [
 instrs = [
   LOAD_CONST(0),
   LOAD_CONST(1),
+  PRINT_ITEM,
 ]
 
 f = Module('main', consts=consts, instrs=instrs)
