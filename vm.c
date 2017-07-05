@@ -49,6 +49,9 @@ bool vm_exec(R_vm *this, R_op *instr) {
     case PRINT_ITEM:
       R_PRINT_ITEM(this);
       break;
+    case ADD:
+      R_ADD(this);
+      break;
     default:
       printf("Unknown instruction %d %d %d %d\n", instr->op, instr->args[0], instr->args[1], instr->args[2]);
   }

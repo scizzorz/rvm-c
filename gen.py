@@ -61,9 +61,34 @@ class Op(ct.Structure):
 
   LOAD_CONST = 0
   PRINT_ITEM = 1
+  ADD        = 2
+  SUB        = 3
+  MUL        = 4
+  DIV        = 5
+  NEG        = 6
+  NOT        = 7
+  LT         = 8
+  GT         = 9
+  LE         = 10
+  GE         = 11
+  EQ         = 12
+  NE         = 13
+
 
 LOAD_CONST = lambda x: Op(Op.LOAD_CONST, x, 0, 0)
 PRINT_ITEM = Op(Op.PRINT_ITEM, 0, 0, 0)
+ADD = Op(Op.ADD, 0, 0, 0)
+SUB = Op(Op.SUB, 0, 0, 0)
+MUL = Op(Op.MUL, 0, 0, 0)
+DIV = Op(Op.DIV, 0, 0, 0)
+NEG = Op(Op.NEG, 0, 0, 0)
+NOT = Op(Op.NOT, 0, 0, 0)
+LT  = Op(Op.LT, 0, 0, 0)
+GT  = Op(Op.GT, 0, 0, 0)
+LE  = Op(Op.LE, 0, 0, 0)
+GE  = Op(Op.GE, 0, 0, 0)
+EQ  = Op(Op.EQ, 0, 0, 0)
+NE  = Op(Op.NE, 0, 0, 0)
 
 
 class Module:
@@ -91,6 +116,8 @@ consts = [
 instrs = [
   LOAD_CONST(0),
   LOAD_CONST(1),
+  PRINT_ITEM,
+  ADD,
   PRINT_ITEM,
 ]
 

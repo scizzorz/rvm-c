@@ -11,6 +11,8 @@ void R_LOAD_CONST(R_vm *this, char idx) {
 }
 
 void R_ADD(R_vm *this) {
-  R_box *lhs = this->stack + this->stack_ptr - 1;
-  R_box *rhs = this->stack + this->stack_ptr - 2;
+  R_box lhs = vm_pop(this);
+  R_box rhs = vm_top(this);
+  lhs.data.si += rhs.data.si;
+  vm_set(this, &lhs);
 }
