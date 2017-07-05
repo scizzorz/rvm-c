@@ -20,5 +20,9 @@ bool vm_exec(R_vm *this, R_op *instr);
 bool vm_step(R_vm *this);
 bool vm_run(R_vm *this);
 void vm_dump(R_vm *this);
+R_box vm_pop(R_vm *this);
+R_box vm_top(R_vm *this);
+void vm_push(R_vm *this, R_box *val);
+void vm_set(R_vm *this, R_box *val);
 
 #endif

@@ -92,3 +92,21 @@ void vm_dump(R_vm *this) {
     box_print(this->stack + i);
   }
 }
+
+R_box vm_pop(R_vm *this) {
+  this->stack_ptr -= 1;
+  return this->stack[this->stack_ptr];
+}
+
+R_box vm_top(R_vm *this) {
+  return this->stack[this->stack_ptr - 1];
+}
+
+void vm_push(R_vm *this, R_box *val) {
+  this->stack[this->stack_ptr] = *val;
+  this->stack_ptr += 1;
+}
+
+void vm_set(R_vm *this, R_box *val) {
+  this->stack[this->stack_ptr - 1] = *val;
+}
