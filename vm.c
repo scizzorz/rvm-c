@@ -42,30 +42,23 @@ R_vm *vm_load(FILE *fp) {
 }
 
 bool vm_exec(R_vm *this, R_op *instr) {
-  switch(instr->op) {
-    case LOAD_CONST:
-      R_LOAD_CONST(this, instr->args[0]);
-      break;
-    case PRINT_ITEM:
-      R_PRINT_ITEM(this);
-      break;
-    case ADD:
-      R_ADD(this);
-      break;
-    default:
-      printf("Unknown instruction %d %d %d %d\n", instr->op, instr->args[0], instr->args[1], instr->args[2]);
+  if(instr->op >= 0 && instr->op < NUM_INSTRS) {
+    R_INSTR_TABLE[instr->op](this, instr);
+    return true;
   }
 
-  return true;
+  printf("Unknown instruction %02x %02x %02x %02x\n", instr->op, instr->args[0], instr->args[1], instr->args[2]);
+  return false;
 }
 
 bool vm_step(R_vm *this) {
-  if(this->instr_ptr < this->num_instrs) {
+  if(this->instr_ptr >= 0 && this->instr_ptr < this->num_instrs) {
     vm_exec(this, this->instrs + this->instr_ptr);
     this->instr_ptr += 1;
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 bool vm_run(R_vm *this) {
