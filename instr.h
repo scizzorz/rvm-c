@@ -19,9 +19,11 @@
 #define EQ         0x0C
 #define NE         0x0D
 #define JUMP       0x0E
-#define JUMPIF     0x10
+#define JUMPIF     0x0F
+#define DUP        0x10
+#define POP        0x11
 
-#define NUM_INSTRS 0x10
+#define NUM_INSTRS 0x12
 
 void R_PUSH_CONST(R_vm *vm, R_op *instr);
 void R_PRINT_ITEM(R_vm *vm, R_op *instr);
@@ -39,6 +41,8 @@ void R_EQ(R_vm *vm, R_op *instr);
 void R_NE(R_vm *vm, R_op *instr);
 void R_JUMP(R_vm *vm, R_op *instr);
 void R_JUMPIF(R_vm *vm, R_op *instr);
+void R_DUP(R_vm *vm, R_op *instr);
+void R_POP(R_vm *vm, R_op *instr);
 
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *);
 
