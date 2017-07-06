@@ -82,9 +82,18 @@ void vm_dump(R_vm *this) {
     op_print(this->instrs + i);
   }
 
-  printf("Stack (%d):\n", this->stack_size);
+  printf("Stack (%d / %d):\n", this->stack_ptr, this->stack_size);
   for(int i=0; i<this->stack_size; i++) {
-    printf(i == this->stack_ptr ? "-> " : "   ");
+    if(i < this->stack_ptr - 1) {
+      printf("|  ");
+    }
+    else if(i == this->stack_ptr - 1) {
+      printf("-> ");
+    }
+    else {
+      printf("   ");
+    }
+
     box_print(this->stack + i);
   }
 }
