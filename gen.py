@@ -59,7 +59,7 @@ class Op(ct.Structure):
               ('arg1', ct.c_uint8),
               ('arg2', ct.c_uint8)]
 
-  LOAD_CONST = 0
+  PUSH_CONST = 0
   PRINT_ITEM = 1
   ADD        = 2
   SUB        = 3
@@ -73,9 +73,13 @@ class Op(ct.Structure):
   GE         = 11
   EQ         = 12
   NE         = 13
+  JUMP       = 14
+  JUMPIF     = 15
+  DUP        = 16
+  POP        = 17
 
 
-LOAD_CONST = lambda x: Op(Op.LOAD_CONST, x, 0, 0)
+PUSH_CONST = lambda x: Op(Op.PUSH_CONST, x, 0, 0)
 PRINT_ITEM = Op(Op.PRINT_ITEM, 0, 0, 0)
 ADD = Op(Op.ADD, 0, 0, 0)
 SUB = Op(Op.SUB, 0, 0, 0)
@@ -89,6 +93,11 @@ LE  = Op(Op.LE, 0, 0, 0)
 GE  = Op(Op.GE, 0, 0, 0)
 EQ  = Op(Op.EQ, 0, 0, 0)
 NE  = Op(Op.NE, 0, 0, 0)
+JUMP = Op(Op.JUMP, 0, 0, 0)
+JUMPIF = lambda pos, neg: Op(Op.JUMPIF, pos, neg, 0)
+DUP = Op(Op.DUP, 0, 0, 0)
+POP = Op(Op.POP, 0, 0, 0)
+
 
 
 class Module:
@@ -109,15 +118,28 @@ class Module:
         fp.write(instr)
 
 consts = [
+  Box.to_rain(0),
+  Box.to_rain(1),
   Box.to_rain(10),
-  Box.to_rain(12),
 ]
 
+# PUSH 0 (0)
+# PUSH 1 (1)
+# ADD
+# DUP
+# PUSH 2 (10)
+# NE
+# JUMPIF 0 -5
+
 instrs = [
-  LOAD_CONST(0),
-  LOAD_CONST(1),
-  PRINT_ITEM,
+  PUSH_CONST(0),
+  PUSH_CONST(1),
   ADD,
+  PRINT_ITEM,
+  DUP,
+  PUSH_CONST(2),
+  NE,
+  JUMPIF(0, 7),
   PRINT_ITEM,
 ]
 
