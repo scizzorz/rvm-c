@@ -1,7 +1,10 @@
 # vim: set noet:
-LIBS=-lgc
+LIBS=-lgc -ldl
 
-all: rain
+all: rain dyn.so
+
+dyn.so: dyn.c
+	clang -shared -fPIC -o $@ $^
 
 rain: main.o core.o vm.o instr.o
 	clang -o $@ ${LIBS} $^

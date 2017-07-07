@@ -69,6 +69,8 @@ class Op(ct.Structure):
   JUMPIF     = 0x06
   DUP        = 0x07
   POP        = 0x08
+  LOAD       = 0x09
+  CALL       = 0x0A
 
   CMP_LT     = 0x00
   CMP_LE     = 0x01
@@ -104,6 +106,8 @@ JUMP = lambda pos, neg: Op(Op.JUMP, pos, neg, 0)
 JUMPIF = lambda pos, neg: Op(Op.JUMPIF, pos, neg, 0)
 DUP = Op(Op.DUP, 0, 0, 0)
 POP = Op(Op.POP, 0, 0, 0)
+LOAD = Op(Op.LOAD, 0, 0, 0)
+CALL = Op(Op.CALL, 0, 0, 0)
 
 
 
@@ -130,10 +134,8 @@ class Module:
         fp.write(instr)
 
 consts = [
-  Box.to_rain(0),
-  Box.to_rain(1),
-  Box.to_rain(10),
-  Box.to_rain("LOL"),
+  Box.to_rain("/home/weachockj/rvm-c/dyn.so"),
+  Box.to_rain("print_hello"),
 ]
 
 # PUSH 0 (0)
@@ -146,14 +148,9 @@ consts = [
 
 instrs = [
   PUSH_CONST(0),
+  LOAD,
   PUSH_CONST(1),
-  ADD,
-  PRINT_ITEM,
-  DUP,
-  PUSH_CONST(2),
-  NE,
-  JUMPIF(0, 7),
-  PRINT_ITEM,
+  CALL,
 ]
 
 f = Module('main', consts=consts, instrs=instrs)

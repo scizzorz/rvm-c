@@ -1,4 +1,6 @@
 #include "rain.h"
+#define __USE_GNU
+#include <dlfcn.h>
 
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_PUSH_CONST,
@@ -10,6 +12,8 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_JUMPIF,
   R_DUP,
   R_POP,
+  R_LOAD,
+  R_CALL,
 };
 
 
@@ -23,6 +27,8 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "JUMPIF",
   "DUP",
   "POP",
+  "LOAD",
+  "CALL",
 };
 
 void R_PRINT_ITEM(R_vm *vm, R_op *instr) {
@@ -159,4 +165,25 @@ void R_DUP(R_vm *vm, R_op *instr) {
 
 void R_POP(R_vm *vm, R_op *instr) {
   vm_pop(vm);
+}
+
+void R_LOAD(R_vm *vm, R_op *instr) {
+  R_box *top = vm->stack + vm->stack_ptr - 1;
+  if(TYPE_IS(top, STR)) {
+    void *ptr = dlopen(top->data.s, RTLD_LAZY | RTLD_GLOBAL);
+    R_set_cdata(top, ptr);
+    return;
+  }
+
+  R_set_null(top);
+}
+
+void R_CALL(R_vm *vm, R_op *instr) {
+  R_box name = vm_pop(vm);
+  R_box *top = vm->stack + vm->stack_ptr - 1;
+  if(TYPE_IS(&name, STR) && TYPE_IS(top, CDATA)) {
+    void *ptr = dlsym(top->data.p, name.data.s);
+    void (*callable)(R_vm *) = (void (*)(R_vm *))ptr;
+    callable(vm);
+  }
 }

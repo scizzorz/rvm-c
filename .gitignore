@@ -1,3 +1,4 @@
 rain
 *.o
+*.so
 *.rnc
