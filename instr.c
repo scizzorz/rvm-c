@@ -87,9 +87,51 @@ void R_BIN_OP(R_vm *vm, R_op *instr) {
 void R_CMP(R_vm *vm, R_op *instr) {
   R_box lhs = vm_pop(vm);
   R_box rhs = vm_top(vm);
-  lhs.type = TYPE_BOOL;
-  lhs.data.si = lhs.data.si != rhs.data.si;
-  vm_set(vm, &lhs);
+  R_box *top = vm->stack + vm->stack_ptr - 1;
+
+  if(lhs.type != rhs.type) {
+    R_set_bool(top, false);
+    return;
+  }
+
+  if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, INT)) {
+    switch(instr->args[0]) {
+      case CMP_LT: R_set_bool(top, lhs.data.si < rhs.data.si); break;
+      case CMP_LE: R_set_bool(top, lhs.data.si <= rhs.data.si); break;
+      case CMP_GT: R_set_bool(top, lhs.data.si > rhs.data.si); break;
+      case CMP_GE: R_set_bool(top, lhs.data.si >= rhs.data.si); break;
+      case CMP_EQ: R_set_bool(top, lhs.data.si == rhs.data.si); break;
+      case CMP_NE: R_set_bool(top, lhs.data.si != rhs.data.si); break;
+    }
+    return;
+  }
+
+  // TODO: add int/float and float/int comparisons?
+  else if(TYPE_IS(&lhs, FLOAT) && TYPE_IS(&rhs, FLOAT)) {
+    switch(instr->args[0]) {
+      case CMP_LT: R_set_bool(top, lhs.data.f < rhs.data.f); break;
+      case CMP_LE: R_set_bool(top, lhs.data.f <= rhs.data.f); break;
+      case CMP_GT: R_set_bool(top, lhs.data.f > rhs.data.f); break;
+      case CMP_GE: R_set_bool(top, lhs.data.f >= rhs.data.f); break;
+      case CMP_EQ: R_set_bool(top, lhs.data.f == rhs.data.f); break;
+      case CMP_NE: R_set_bool(top, lhs.data.f != rhs.data.f); break;
+    }
+    return;
+  }
+
+  else if(TYPE_IS(&lhs, BOOL) && TYPE_IS(&rhs, BOOL)) {
+    switch(instr->args[0]) {
+      case CMP_LT: R_set_bool(top, lhs.data.ui < rhs.data.ui); break;
+      case CMP_LE: R_set_bool(top, lhs.data.ui <= rhs.data.ui); break;
+      case CMP_GT: R_set_bool(top, lhs.data.ui > rhs.data.ui); break;
+      case CMP_GE: R_set_bool(top, lhs.data.ui >= rhs.data.ui); break;
+      case CMP_EQ: R_set_bool(top, lhs.data.ui == rhs.data.ui); break;
+      case CMP_NE: R_set_bool(top, lhs.data.ui != rhs.data.ui); break;
+    }
+    return;
+  }
+
+  R_set_null(top);
 }
 
 
