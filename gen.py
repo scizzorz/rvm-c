@@ -59,41 +59,47 @@ class Op(ct.Structure):
               ('arg1', ct.c_uint8),
               ('arg2', ct.c_uint8)]
 
-  PUSH_CONST = 0
-  PRINT_ITEM = 1
-  ADD        = 2
-  SUB        = 3
-  MUL        = 4
-  DIV        = 5
-  NEG        = 6
-  NOT        = 7
-  LT         = 8
-  GT         = 9
-  LE         = 10
-  GE         = 11
-  EQ         = 12
-  NE         = 13
-  JUMP       = 14
-  JUMPIF     = 15
-  DUP        = 16
-  POP        = 17
+  PUSH_CONST = 0x00
+  PRINT_ITEM = 0x01
+  UN_OP      = 0x02
+  BIN_OP     = 0x03
+  CMP        = 0x04
+  JUMP       = 0x05
+  JUMPIF     = 0x06
+  DUP        = 0x07
+  POP        = 0x08
+
+  CMP_LT     = 0x00
+  CMP_LE     = 0x01
+  CMP_GT     = 0x02
+  CMP_GE     = 0x03
+  CMP_EQ     = 0x04
+  CMP_NE     = 0x05
+
+  BIN_ADD    = 0x00
+  BIN_SUB    = 0x01
+  BIN_MUL    = 0x02
+  BIN_DIV    = 0x03
+
+  UN_NEG     = 0x00
+  UN_NOT     = 0x01
 
 
 PUSH_CONST = lambda x: Op(Op.PUSH_CONST, x, 0, 0)
 PRINT_ITEM = Op(Op.PRINT_ITEM, 0, 0, 0)
-ADD = Op(Op.ADD, 0, 0, 0)
-SUB = Op(Op.SUB, 0, 0, 0)
-MUL = Op(Op.MUL, 0, 0, 0)
-DIV = Op(Op.DIV, 0, 0, 0)
-NEG = Op(Op.NEG, 0, 0, 0)
-NOT = Op(Op.NOT, 0, 0, 0)
-LT  = Op(Op.LT, 0, 0, 0)
-GT  = Op(Op.GT, 0, 0, 0)
-LE  = Op(Op.LE, 0, 0, 0)
-GE  = Op(Op.GE, 0, 0, 0)
-EQ  = Op(Op.EQ, 0, 0, 0)
-NE  = Op(Op.NE, 0, 0, 0)
-JUMP = Op(Op.JUMP, 0, 0, 0)
+ADD = Op(Op.BIN_OP, Op.BIN_ADD, 0, 0)
+SUB = Op(Op.BIN_OP, Op.BIN_SUB, 0, 0)
+MUL = Op(Op.BIN_OP, Op.BIN_MUL, 0, 0)
+DIV = Op(Op.BIN_OP, Op.BIN_DIV, 0, 0)
+NEG = Op(Op.UN_OP, Op.UN_NEG, 0, 0)
+NOT = Op(Op.UN_OP, Op.UN_NOT, 0, 0)
+LT  = Op(Op.CMP, Op.CMP_LT, 0, 0)
+GT  = Op(Op.CMP, Op.CMP_GT, 0, 0)
+LE  = Op(Op.CMP, Op.CMP_LE, 0, 0)
+GE  = Op(Op.CMP, Op.CMP_GE, 0, 0)
+EQ  = Op(Op.CMP, Op.CMP_EQ, 0, 0)
+NE  = Op(Op.CMP, Op.CMP_NE, 0, 0)
+JUMP = lambda pos, neg: Op(Op.JUMP, pos, neg, 0)
 JUMPIF = lambda pos, neg: Op(Op.JUMPIF, pos, neg, 0)
 DUP = Op(Op.DUP, 0, 0, 0)
 POP = Op(Op.POP, 0, 0, 0)

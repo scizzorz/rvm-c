@@ -3,18 +3,9 @@
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_PUSH_CONST,
   R_PRINT_ITEM,
-  R_ADD,
-  R_SUB,
-  R_MUL,
-  R_DIV,
-  R_NEG,
-  R_NOT,
-  R_LT,
-  R_GT,
-  R_LE,
-  R_GE,
-  R_EQ,
-  R_NE,
+  R_UN_OP,
+  R_BIN_OP,
+  R_CMP,
   R_JUMP,
   R_JUMPIF,
   R_DUP,
@@ -25,18 +16,9 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
 const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "PUSH_CONST",
   "PRINT_ITEM",
-  "ADD",
-  "SUB",
-  "MUL",
-  "DIV",
-  "NEG",
-  "NOT",
-  "LT",
-  "GT",
-  "LE",
-  "GE",
-  "EQ",
-  "NE",
+  "UN_OP",
+  "BIN_OP",
+  "CMP",
   "JUMP",
   "JUMPIF",
   "DUP",
@@ -54,56 +36,55 @@ void R_PUSH_CONST(R_vm *vm, R_op *instr) {
   vm->stack_ptr += 1;
 }
 
+void R_UN_OP(R_vm *vm, R_op *instr) {
+}
 
-void R_ADD(R_vm *vm, R_op *instr) {
+void R_BIN_OP(R_vm *vm, R_op *instr) {
   R_box lhs = vm_pop(vm);
   R_box rhs = vm_top(vm);
-  lhs.data.si += rhs.data.si;
-  vm_set(vm, &lhs);
+  R_box *top = vm->stack + vm->stack_ptr - 1;
+  bool do_float = false;
+  double lhs_f, rhs_f;
+
+  if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, INT)) {
+    switch(instr->args[0]) {
+      case BIN_ADD: R_set_int(top, lhs.data.si + rhs.data.si); break;
+      case BIN_SUB: R_set_int(top, lhs.data.si - rhs.data.si); break;
+      case BIN_MUL: R_set_int(top, lhs.data.si * rhs.data.si); break;
+      case BIN_DIV: R_set_int(top, lhs.data.si / rhs.data.si); break;
+    }
+    return;
+  }
+  else if(TYPE_IS(&lhs, FLOAT) && TYPE_IS(&rhs, INT)) {
+    lhs_f = lhs.data.f;
+    rhs_f = (double)rhs.data.si;
+    do_float = true;
+  }
+  else if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, FLOAT)) {
+    lhs_f = (double)lhs.data.si;
+    rhs_f = rhs.data.f;
+    do_float = true;
+  }
+  else if(TYPE_IS(&lhs, FLOAT) && TYPE_IS(&rhs, FLOAT)) {
+    lhs_f = lhs.data.f;
+    rhs_f = rhs.data.f;
+    do_float = true;
+  }
+
+  if(do_float) {
+    switch(instr->args[0]) {
+      case BIN_ADD: R_set_float(top, lhs_f + rhs_f); break;
+      case BIN_SUB: R_set_float(top, lhs_f - rhs_f); break;
+      case BIN_MUL: R_set_float(top, lhs_f * rhs_f); break;
+      case BIN_DIV: R_set_float(top, lhs_f / rhs_f); break;
+    }
+    return;
+  }
+
+  R_set_null(top);
 }
 
-
-void R_SUB(R_vm *vm, R_op *instr) {
-}
-
-
-void R_MUL(R_vm *vm, R_op *instr) {
-}
-
-
-void R_DIV(R_vm *vm, R_op *instr) {
-}
-
-
-void R_NEG(R_vm *vm, R_op *instr) {
-}
-
-
-void R_NOT(R_vm *vm, R_op *instr) {
-}
-
-
-void R_LT(R_vm *vm, R_op *instr) {
-}
-
-
-void R_GT(R_vm *vm, R_op *instr) {
-}
-
-
-void R_LE(R_vm *vm, R_op *instr) {
-}
-
-
-void R_GE(R_vm *vm, R_op *instr) {
-}
-
-
-void R_EQ(R_vm *vm, R_op *instr) {
-}
-
-
-void R_NE(R_vm *vm, R_op *instr) {
+void R_CMP(R_vm *vm, R_op *instr) {
   R_box lhs = vm_pop(vm);
   R_box rhs = vm_top(vm);
   lhs.type = TYPE_BOOL;
