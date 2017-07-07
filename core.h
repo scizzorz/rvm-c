@@ -44,7 +44,7 @@ void R_set_box(R_box *ret, R_box *from);
 void R_set_null(R_box *ret);
 void R_set_int(R_box *ret, signed long si);
 void R_set_float(R_box *ret, double f);
-void R_set_bool(R_box *ret, unsigned char v);
+void R_set_bool(R_box *ret, bool v);
 void R_set_str(R_box *ret, char* s);
 void R_set_strcpy(R_box *ret, const char *s);
 void R_set_table(R_box *ret);

@@ -60,9 +60,9 @@ void R_set_float(R_box *ret, double f) {
   ret->size = 0;
 }
 
-void R_set_bool(R_box *ret, unsigned char v) {
+void R_set_bool(R_box *ret, bool v) {
   ret->type = TYPE_BOOL;
-  ret->data.ui = !!v;
+  ret->data.ui = v;
   ret->size = 0;
 }
 
