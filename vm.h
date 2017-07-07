@@ -7,9 +7,11 @@ typedef struct R_vm {
   int instr_ptr;
   int num_consts;
   int num_instrs;
+  int num_strings;
   int stack_ptr;
   int stack_size;
 
+  char **strings;
   R_box *consts;
   R_op *instrs;
   R_box *stack;

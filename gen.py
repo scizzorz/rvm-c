@@ -12,6 +12,7 @@ class Box(ct.Structure):
   cdata = 7
 
   _saves_ = []
+  _strings_ = []
 
   def __str__(self):
     env_p = ct.cast(self.env, ct.c_void_p).value or 0
@@ -41,9 +42,9 @@ class Box(ct.Structure):
       intrep = struct.unpack('Q', raw)[0]
       return cls.new(cls.float, 0, intrep, cls.null)
     elif isinstance(val, str):
-      str_p = ct.create_string_buffer(val.encode('utf-8'))
-      cls._saves_.append(str_p)
-      return cls.new(cls.str, len(val), ct.cast(str_p, ct.c_void_p).value, cls.null)
+      idx = len(cls._strings_)
+      cls._strings_.append(val)
+      return cls.new(cls.str, len(val), idx, cls.null)
 
     raise Exception("Can't convert value {!r} to Rain".format(val))
 
@@ -113,9 +114,14 @@ class Module:
     self.instrs = instrs
 
   def write(self):
-    with open(f'{self.name}.rnc', 'wb') as fp:
+    with open('{0.name}.rnc'.format(self), 'wb') as fp:
       fp.write(struct.pack('<I', len(self.consts)))
       fp.write(struct.pack('<I', len(self.instrs)))
+      fp.write(struct.pack('<I', len(Box._strings_)))
+
+      for string in Box._strings_:
+        fp.write(struct.pack('<I', len(string)))
+        fp.write(string.encode('utf-8'))
 
       for const in self.consts:
         fp.write(const)
@@ -127,6 +133,7 @@ consts = [
   Box.to_rain(0),
   Box.to_rain(1),
   Box.to_rain(10),
+  Box.to_rain("LOL"),
 ]
 
 # PUSH 0 (0)

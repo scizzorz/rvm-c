@@ -18,18 +18,49 @@ R_vm *vm_load(FILE *fp) {
     return NULL;
   }
 
+  rv = fread(&this->num_strings, sizeof(int), 1, fp);
+  if(rv != 1) {
+    fprintf(stderr, "Unable to read num_strings\n");
+    return NULL;
+  }
+
   this->instr_ptr = 0;
   this->stack_ptr = 0;
   this->stack_size = 10;
 
   this->stack = GC_malloc(sizeof(R_box) * this->stack_size);
+  this->strings = GC_malloc(sizeof(char *) * this->num_strings);
   this->consts = GC_malloc(sizeof(R_box) * this->num_consts);
   this->instrs = GC_malloc(sizeof(R_op) * this->num_instrs);
+
+  int len = 0;
+  for(int i=0; i<this->num_strings; i++) {
+    rv = fread(&len, sizeof(int), 1, fp);
+    if(rv != 1) {
+      fprintf(stderr, "Unable to read string %d length\n", i);
+      return NULL;
+    }
+
+    this->strings[i] = GC_malloc(sizeof(char) * len + 1);
+    rv = fread(this->strings[i], sizeof(char), len, fp);
+    if(rv != len) {
+      fprintf(stderr, "Unable to read string %d\n", i);
+      return NULL;
+    }
+
+    this->strings[i][len] = 0;
+  }
 
   rv = fread(this->consts, sizeof(R_box), this->num_consts, fp);
   if(rv != this->num_consts) {
     fprintf(stderr, "Unable to read constants\n");
     return NULL;
+  }
+
+  for(int i=0; i<this->num_consts; i++) {
+    if(TYPE_IS(&this->consts[i], STR)) {
+      this->consts[i].data.s = this->strings[this->consts[i].data.si];
+    }
   }
 
   rv = fread(this->instrs, sizeof(R_op), this->num_instrs, fp);
