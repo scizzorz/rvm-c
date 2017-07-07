@@ -84,9 +84,10 @@ bool vm_exec(R_vm *this, R_op *instr) {
 
 bool vm_step(R_vm *this) {
   if(this->instr_ptr >= 0 && this->instr_ptr < this->num_instrs) {
-    vm_exec(this, this->instrs + this->instr_ptr);
-    this->instr_ptr += 1;
-    return true;
+    if(vm_exec(this, this->instrs + this->instr_ptr)) {
+      this->instr_ptr += 1;
+      return true;
+    }
   }
 
   return false;
