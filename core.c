@@ -106,5 +106,5 @@ void R_set_meta(R_box *val, R_box *meta) {
 }
 
 void R_op_print(R_op *instr) {
-  printf("%s (%d, %d, %d)\n", R_INSTR_NAMES[instr->op], instr->args[0], instr->args[1], instr->args[2]);
+  printf("%s (%d | %d)\n", R_INSTR_NAMES[R_OP(instr)], R_SI(instr), R_UI(instr));
 }

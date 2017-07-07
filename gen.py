@@ -55,10 +55,10 @@ Box._fields_ = [('type', ct.c_uint8),
 Box.null = ct.POINTER(Box)()
 
 class Op(ct.Structure):
-  _fields_ = [('op', ct.c_uint8),
-              ('arg0', ct.c_uint8),
-              ('arg1', ct.c_uint8),
-              ('arg2', ct.c_uint8)]
+  _fields_ = [('a', ct.c_uint8),
+              ('b', ct.c_uint8),
+              ('c', ct.c_uint8),
+              ('op', ct.c_uint8)]
 
   PUSH_CONST = 0x00
   PRINT_ITEM = 0x01
@@ -86,26 +86,34 @@ class Op(ct.Structure):
   UN_NOT     = 0x01
 
 
-PUSH_CONST = lambda x: Op(Op.PUSH_CONST, x, 0, 0)
+def si2abc(val):
+  b = struct.pack('<i', val)
+  return b[0], b[1], b[2]
+
+
+def ui2abc(val):
+  b = struct.pack('<I', val)
+  return b[0], b[1], b[2]
+
+
+PUSH_CONST = lambda x: Op(Op.PUSH_CONST, *ui2abc(x))
 PRINT_ITEM = Op(Op.PRINT_ITEM, 0, 0, 0)
-ADD = Op(Op.BIN_OP, Op.BIN_ADD, 0, 0)
-SUB = Op(Op.BIN_OP, Op.BIN_SUB, 0, 0)
-MUL = Op(Op.BIN_OP, Op.BIN_MUL, 0, 0)
-DIV = Op(Op.BIN_OP, Op.BIN_DIV, 0, 0)
-NEG = Op(Op.UN_OP, Op.UN_NEG, 0, 0)
-NOT = Op(Op.UN_OP, Op.UN_NOT, 0, 0)
-LT  = Op(Op.CMP, Op.CMP_LT, 0, 0)
-GT  = Op(Op.CMP, Op.CMP_GT, 0, 0)
-LE  = Op(Op.CMP, Op.CMP_LE, 0, 0)
-GE  = Op(Op.CMP, Op.CMP_GE, 0, 0)
-EQ  = Op(Op.CMP, Op.CMP_EQ, 0, 0)
-NE  = Op(Op.CMP, Op.CMP_NE, 0, 0)
-JUMP = lambda pos, neg: Op(Op.JUMP, pos, neg, 0)
-JUMPIF = lambda pos, neg: Op(Op.JUMPIF, pos, neg, 0)
+ADD = Op(Op.BIN_OP, *ui2abc(Op.BIN_ADD))
+SUB = Op(Op.BIN_OP, *ui2abc(Op.BIN_SUB))
+MUL = Op(Op.BIN_OP, *ui2abc(Op.BIN_MUL))
+DIV = Op(Op.BIN_OP, *ui2abc(Op.BIN_DIV))
+NEG = Op(Op.UN_OP, *ui2abc(Op.UN_NEG))
+NOT = Op(Op.UN_OP, *ui2abc(Op.UN_NOT))
+LT  = Op(Op.CMP, *ui2abc(Op.CMP_LT))
+GT  = Op(Op.CMP, *ui2abc(Op.CMP_GT))
+LE  = Op(Op.CMP, *ui2abc(Op.CMP_LE))
+GE  = Op(Op.CMP, *ui2abc(Op.CMP_GE))
+EQ  = Op(Op.CMP, *ui2abc(Op.CMP_EQ))
+NE  = Op(Op.CMP, *ui2abc(Op.CMP_NE))
+JUMP = lambda offset: Op(Op.JUMP, *si2abc(offset))
+JUMPIF = lambda offset: Op(Op.JUMPIF, *si2abc(offset))
 DUP = Op(Op.DUP, 0, 0, 0)
 POP = Op(Op.POP, 0, 0, 0)
-
-
 
 class Module:
   def __init__(self, name, consts=[], instrs=[]):
@@ -152,7 +160,7 @@ instrs = [
   DUP,
   PUSH_CONST(2),
   NE,
-  JUMPIF(0, 7),
+  JUMPIF(-7),
   PRINT_ITEM,
 ]
 

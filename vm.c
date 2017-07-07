@@ -73,12 +73,12 @@ R_vm *vm_load(FILE *fp) {
 }
 
 bool vm_exec(R_vm *this, R_op *instr) {
-  if(instr->op >= 0 && instr->op < NUM_INSTRS) {
-    R_INSTR_TABLE[instr->op](this, instr);
+  if(R_OP(instr) < NUM_INSTRS) {
+    R_INSTR_TABLE[R_OP(instr)](this, instr);
     return true;
   }
 
-  printf("Unknown instruction %02x %02x %02x %02x\n", instr->op, instr->args[0], instr->args[1], instr->args[2]);
+  printf("Unknown instruction %02x %06x\n", R_OP(instr), R_UI(instr));
   return false;
 }
 

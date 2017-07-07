@@ -32,9 +32,13 @@ typedef struct R_box {
   struct R_box *meta;
 } R_box;
 
-typedef struct R_op {
-  char op;
-  char args[3];
+#define R_OP(x) ((x->ui & 0xFF))
+#define R_SI(x) ((x->si >> 8))
+#define R_UI(x) ((x->ui >> 8))
+
+typedef union {
+  unsigned int ui;
+  signed int si;
 } R_op;
 
 void R_box_print(R_box *val);

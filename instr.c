@@ -32,7 +32,7 @@ void R_PRINT_ITEM(R_vm *vm, R_op *instr) {
 
 
 void R_PUSH_CONST(R_vm *vm, R_op *instr) {
-  vm->stack[vm->stack_ptr] = vm->consts[instr->args[0]];
+  vm->stack[vm->stack_ptr] = vm->consts[R_UI(instr)];
   vm->stack_ptr += 1;
 }
 
@@ -47,7 +47,7 @@ void R_BIN_OP(R_vm *vm, R_op *instr) {
   double lhs_f, rhs_f;
 
   if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, INT)) {
-    switch(instr->args[0]) {
+    switch(R_UI(instr)) {
       case BIN_ADD: R_set_int(top, lhs.data.si + rhs.data.si); break;
       case BIN_SUB: R_set_int(top, lhs.data.si - rhs.data.si); break;
       case BIN_MUL: R_set_int(top, lhs.data.si * rhs.data.si); break;
@@ -72,7 +72,7 @@ void R_BIN_OP(R_vm *vm, R_op *instr) {
   }
 
   if(do_float) {
-    switch(instr->args[0]) {
+    switch(R_UI(instr)) {
       case BIN_ADD: R_set_float(top, lhs_f + rhs_f); break;
       case BIN_SUB: R_set_float(top, lhs_f - rhs_f); break;
       case BIN_MUL: R_set_float(top, lhs_f * rhs_f); break;
@@ -95,7 +95,7 @@ void R_CMP(R_vm *vm, R_op *instr) {
   }
 
   if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, INT)) {
-    switch(instr->args[0]) {
+    switch(R_UI(instr)) {
       case CMP_LT: R_set_bool(top, lhs.data.si < rhs.data.si); break;
       case CMP_LE: R_set_bool(top, lhs.data.si <= rhs.data.si); break;
       case CMP_GT: R_set_bool(top, lhs.data.si > rhs.data.si); break;
@@ -108,7 +108,7 @@ void R_CMP(R_vm *vm, R_op *instr) {
 
   // TODO: add int/float and float/int comparisons?
   else if(TYPE_IS(&lhs, FLOAT) && TYPE_IS(&rhs, FLOAT)) {
-    switch(instr->args[0]) {
+    switch(R_UI(instr)) {
       case CMP_LT: R_set_bool(top, lhs.data.f < rhs.data.f); break;
       case CMP_LE: R_set_bool(top, lhs.data.f <= rhs.data.f); break;
       case CMP_GT: R_set_bool(top, lhs.data.f > rhs.data.f); break;
@@ -120,7 +120,7 @@ void R_CMP(R_vm *vm, R_op *instr) {
   }
 
   else if(TYPE_IS(&lhs, BOOL) && TYPE_IS(&rhs, BOOL)) {
-    switch(instr->args[0]) {
+    switch(R_UI(instr)) {
       case CMP_LT: R_set_bool(top, lhs.data.ui < rhs.data.ui); break;
       case CMP_LE: R_set_bool(top, lhs.data.ui <= rhs.data.ui); break;
       case CMP_GT: R_set_bool(top, lhs.data.ui > rhs.data.ui); break;
@@ -143,9 +143,7 @@ void R_JUMPIF(R_vm *vm, R_op *instr) {
   R_box top = vm_pop(vm);
 
   if(top.type != TYPE_NULL && !(top.type == TYPE_BOOL && top.data.si == 0)) {
-    vm->instr_ptr += instr->args[0];
-    vm->instr_ptr -= instr->args[1];
-    // TODO: this is awful ^
+    vm->instr_ptr += R_SI(instr);
     // TODO: what if IP goes out of bounds?
   }
 }
