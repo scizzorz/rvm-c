@@ -73,13 +73,13 @@ void vm_dump(R_vm *this) {
   printf("Constants (%d):\n", this->num_consts);
   for(int i=0; i<this->num_consts; i++) {
     printf("   ");
-    box_print(this->consts + i);
+    R_box_print(this->consts + i);
   }
 
   printf("Instructions (%d):\n", this->num_instrs);
   for(int i=0; i<this->num_instrs; i++) {
     printf(i == this->instr_ptr ? "-> " : "   ");
-    op_print(this->instrs + i);
+    R_op_print(this->instrs + i);
   }
 
   printf("Stack (%d / %d):\n", this->stack_ptr, this->stack_size);
@@ -94,7 +94,7 @@ void vm_dump(R_vm *this) {
       printf("   ");
     }
 
-    box_print(this->stack + i);
+    R_box_print(this->stack + i);
   }
 }
 

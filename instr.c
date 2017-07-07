@@ -45,7 +45,7 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
 
 void R_PRINT_ITEM(R_vm *vm, R_op *instr) {
   R_box *val = vm->stack + vm->stack_ptr - 1;
-  box_print(val);
+  R_box_print(val);
 }
 
 
