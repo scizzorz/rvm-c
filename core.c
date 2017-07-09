@@ -84,8 +84,13 @@ void R_set_strcpy(R_box *ret, const char *s) {
 }
 
 void R_set_table(R_box *ret) {
+  R_table *table = GC_malloc(sizeof(R_table));
+  table->cur = 0;
+  table->max = R_INIT_TABLE_SIZE;
+  table->items = GC_malloc(sizeof(R_item *) * R_INIT_TABLE_SIZE);
+
   ret->type = R_TYPE_TABLE;
-  ret->u64 = 0;
+  ret->table = table;
   ret->size = 0;
 }
 

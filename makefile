@@ -3,7 +3,7 @@ LIBS=-lgc
 
 all: rain
 
-rain: main.o core.o vm.o instr.o
+rain: main.o core.o vm.o instr.o table.o
 	clang -o $@ ${LIBS} $^
 
 main.o: main.c
@@ -13,6 +13,9 @@ instr.o: instr.c
 	clang -o $@ -c $^
 
 core.o: core.c
+	clang -o $@ -c $^
+
+table.o: table.c
 	clang -o $@ -c $^
 
 vm.o: vm.c

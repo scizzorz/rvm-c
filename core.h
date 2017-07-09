@@ -23,6 +23,8 @@
 #define R_SI(x) ((x->i32 >> 8))
 #define R_UI(x) ((x->u32 >> 8))
 
+#define R_INIT_TABLE_SIZE 32
+
 struct R_table;
 
 typedef struct R_box {
