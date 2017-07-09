@@ -19,6 +19,12 @@
 #define R_TYPE_IS(x, t) ((x)->type == R_TYPE_##t)
 #define R_TYPE_ISNT(x, t) ((x)->type != R_TYPE_##t)
 
+#define R_OP(x) ((x->i32 & 0xFF))
+#define R_SI(x) ((x->i32 >> 8))
+#define R_UI(x) ((x->u32 >> 8))
+
+struct R_table;
+
 typedef struct R_box {
   char type;
   int32_t size;
@@ -27,14 +33,11 @@ typedef struct R_box {
     int64_t i64;
     double f64;
     char *str;
+    struct R_table *table;
     void *ptr;
   };
   struct R_box *meta;
 } R_box;
-
-#define R_OP(x) ((x->i32 & 0xFF))
-#define R_SI(x) ((x->i32 >> 8))
-#define R_UI(x) ((x->u32 >> 8))
 
 typedef union {
   uint32_t u32;
