@@ -48,26 +48,26 @@ void R_BIN_OP(R_vm *vm, R_op *instr) {
 
   if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, INT)) {
     switch(R_UI(instr)) {
-      case BIN_ADD: R_set_int(top, lhs.data.si + rhs.data.si); break;
-      case BIN_SUB: R_set_int(top, lhs.data.si - rhs.data.si); break;
-      case BIN_MUL: R_set_int(top, lhs.data.si * rhs.data.si); break;
-      case BIN_DIV: R_set_int(top, lhs.data.si / rhs.data.si); break;
+      case BIN_ADD: R_set_int(top, lhs.i64 + rhs.i64); break;
+      case BIN_SUB: R_set_int(top, lhs.i64 - rhs.i64); break;
+      case BIN_MUL: R_set_int(top, lhs.i64 * rhs.i64); break;
+      case BIN_DIV: R_set_int(top, lhs.i64 / rhs.i64); break;
     }
     return;
   }
   else if(TYPE_IS(&lhs, FLOAT) && TYPE_IS(&rhs, INT)) {
-    lhs_f = lhs.data.f;
-    rhs_f = (double)rhs.data.si;
+    lhs_f = lhs.f64;
+    rhs_f = (double)rhs.i64;
     do_float = true;
   }
   else if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, FLOAT)) {
-    lhs_f = (double)lhs.data.si;
-    rhs_f = rhs.data.f;
+    lhs_f = (double)lhs.i64;
+    rhs_f = rhs.f64;
     do_float = true;
   }
   else if(TYPE_IS(&lhs, FLOAT) && TYPE_IS(&rhs, FLOAT)) {
-    lhs_f = lhs.data.f;
-    rhs_f = rhs.data.f;
+    lhs_f = lhs.f64;
+    rhs_f = rhs.f64;
     do_float = true;
   }
 
@@ -96,12 +96,12 @@ void R_CMP(R_vm *vm, R_op *instr) {
 
   if(TYPE_IS(&lhs, INT) && TYPE_IS(&rhs, INT)) {
     switch(R_UI(instr)) {
-      case CMP_LT: R_set_bool(top, lhs.data.si < rhs.data.si); break;
-      case CMP_LE: R_set_bool(top, lhs.data.si <= rhs.data.si); break;
-      case CMP_GT: R_set_bool(top, lhs.data.si > rhs.data.si); break;
-      case CMP_GE: R_set_bool(top, lhs.data.si >= rhs.data.si); break;
-      case CMP_EQ: R_set_bool(top, lhs.data.si == rhs.data.si); break;
-      case CMP_NE: R_set_bool(top, lhs.data.si != rhs.data.si); break;
+      case CMP_LT: R_set_bool(top, lhs.i64 < rhs.i64); break;
+      case CMP_LE: R_set_bool(top, lhs.i64 <= rhs.i64); break;
+      case CMP_GT: R_set_bool(top, lhs.i64 > rhs.i64); break;
+      case CMP_GE: R_set_bool(top, lhs.i64 >= rhs.i64); break;
+      case CMP_EQ: R_set_bool(top, lhs.i64 == rhs.i64); break;
+      case CMP_NE: R_set_bool(top, lhs.i64 != rhs.i64); break;
     }
     return;
   }
@@ -109,24 +109,24 @@ void R_CMP(R_vm *vm, R_op *instr) {
   // TODO: add int/float and float/int comparisons?
   else if(TYPE_IS(&lhs, FLOAT) && TYPE_IS(&rhs, FLOAT)) {
     switch(R_UI(instr)) {
-      case CMP_LT: R_set_bool(top, lhs.data.f < rhs.data.f); break;
-      case CMP_LE: R_set_bool(top, lhs.data.f <= rhs.data.f); break;
-      case CMP_GT: R_set_bool(top, lhs.data.f > rhs.data.f); break;
-      case CMP_GE: R_set_bool(top, lhs.data.f >= rhs.data.f); break;
-      case CMP_EQ: R_set_bool(top, lhs.data.f == rhs.data.f); break;
-      case CMP_NE: R_set_bool(top, lhs.data.f != rhs.data.f); break;
+      case CMP_LT: R_set_bool(top, lhs.f64 < rhs.f64); break;
+      case CMP_LE: R_set_bool(top, lhs.f64 <= rhs.f64); break;
+      case CMP_GT: R_set_bool(top, lhs.f64 > rhs.f64); break;
+      case CMP_GE: R_set_bool(top, lhs.f64 >= rhs.f64); break;
+      case CMP_EQ: R_set_bool(top, lhs.f64 == rhs.f64); break;
+      case CMP_NE: R_set_bool(top, lhs.f64 != rhs.f64); break;
     }
     return;
   }
 
   else if(TYPE_IS(&lhs, BOOL) && TYPE_IS(&rhs, BOOL)) {
     switch(R_UI(instr)) {
-      case CMP_LT: R_set_bool(top, lhs.data.ui < rhs.data.ui); break;
-      case CMP_LE: R_set_bool(top, lhs.data.ui <= rhs.data.ui); break;
-      case CMP_GT: R_set_bool(top, lhs.data.ui > rhs.data.ui); break;
-      case CMP_GE: R_set_bool(top, lhs.data.ui >= rhs.data.ui); break;
-      case CMP_EQ: R_set_bool(top, lhs.data.ui == rhs.data.ui); break;
-      case CMP_NE: R_set_bool(top, lhs.data.ui != rhs.data.ui); break;
+      case CMP_LT: R_set_bool(top, lhs.u64 < rhs.u64); break;
+      case CMP_LE: R_set_bool(top, lhs.u64 <= rhs.u64); break;
+      case CMP_GT: R_set_bool(top, lhs.u64 > rhs.u64); break;
+      case CMP_GE: R_set_bool(top, lhs.u64 >= rhs.u64); break;
+      case CMP_EQ: R_set_bool(top, lhs.u64 == rhs.u64); break;
+      case CMP_NE: R_set_bool(top, lhs.u64 != rhs.u64); break;
     }
     return;
   }
@@ -142,7 +142,7 @@ void R_JUMP(R_vm *vm, R_op *instr) {
 void R_JUMPIF(R_vm *vm, R_op *instr) {
   R_box top = vm_pop(vm);
 
-  if(top.type != TYPE_NULL && !(top.type == TYPE_BOOL && top.data.si == 0)) {
+  if(top.type != TYPE_NULL && !(top.type == TYPE_BOOL && top.i64 == 0)) {
     vm->instr_ptr += R_SI(instr);
     // TODO: what if IP goes out of bounds?
   }

@@ -17,18 +17,16 @@
 #define TYPE_IS(x, t) ((x)->type == TYPE_##t)
 #define TYPE_ISNT(x, t) ((x)->type != TYPE_##t)
 
-typedef union {
-  unsigned long ui;
-  signed long si;
-  double f;
-  char *s;
-  void *p;
-} R_cast;
-
 typedef struct R_box {
   unsigned char type;
   int size;
-  R_cast data;
+  union {
+    unsigned long u64;
+    signed long i64;
+    double f64;
+    char *str;
+    void *ptr;
+  };
   struct R_box *meta;
 } R_box;
 
