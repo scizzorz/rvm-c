@@ -2,6 +2,8 @@
 #define R_CORE_H
 
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 
 // types
@@ -18,11 +20,11 @@
 #define TYPE_ISNT(x, t) ((x)->type != TYPE_##t)
 
 typedef struct R_box {
-  unsigned char type;
-  int size;
+  char type;
+  int32_t size;
   union {
-    unsigned long u64;
-    signed long i64;
+    uint64_t u64;
+    int64_t i64;
     double f64;
     char *str;
     void *ptr;
@@ -30,14 +32,26 @@ typedef struct R_box {
   struct R_box *meta;
 } R_box;
 
-#define R_OP(x) ((x->ui & 0xFF))
-#define R_SI(x) ((x->si >> 8))
-#define R_UI(x) ((x->ui >> 8))
+#define R_OP(x) ((x->i32 & 0xFF))
+#define R_SI(x) ((x->i32 >> 8))
+#define R_UI(x) ((x->u32 >> 8))
 
 typedef union {
-  unsigned int ui;
-  signed int si;
+  uint32_t u32;
+  int32_t i32;
 } R_op;
+
+typedef struct R_item {
+  uint64_t hash;
+  R_box key;
+  R_box val;
+} R_item;
+
+typedef struct R_table {
+  uint32_t cur;
+  uint32_t max;
+  R_item **items;
+} R_table;
 
 void R_box_print(R_box *val);
 void R_op_print(R_op *instr);

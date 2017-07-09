@@ -66,7 +66,7 @@ void R_set_bool(R_box *ret, bool v) {
   ret->size = 0;
 }
 
-void R_set_str(R_box *ret, char* s) {
+void R_set_str(R_box *ret, char *s) {
   ret->type = TYPE_STR;
   ret->str = s;
   ret->size = strlen(s);

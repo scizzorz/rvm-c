@@ -4,12 +4,12 @@
 #include "rain.h"
 
 typedef struct R_vm {
-  int instr_ptr;
-  int num_consts;
-  int num_instrs;
-  int num_strings;
-  int stack_ptr;
-  int stack_size;
+  uint32_t instr_ptr;
+  uint32_t num_consts;
+  uint32_t num_instrs;
+  uint32_t num_strings;
+  uint32_t stack_ptr;
+  uint32_t stack_size;
 
   char **strings;
   R_box *consts;
