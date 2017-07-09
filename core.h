@@ -7,17 +7,17 @@
 #include <stdio.h>
 
 // types
-#define TYPE_NULL  0
-#define TYPE_INT   1
-#define TYPE_FLOAT 2
-#define TYPE_BOOL  3
-#define TYPE_STR   4
-#define TYPE_TABLE 5
-#define TYPE_FUNC  6
-#define TYPE_CDATA 7
+#define R_TYPE_NULL  0
+#define R_TYPE_INT   1
+#define R_TYPE_FLOAT 2
+#define R_TYPE_BOOL  3
+#define R_TYPE_STR   4
+#define R_TYPE_TABLE 5
+#define R_TYPE_FUNC  6
+#define R_TYPE_CDATA 7
 
-#define TYPE_IS(x, t) ((x)->type == TYPE_##t)
-#define TYPE_ISNT(x, t) ((x)->type != TYPE_##t)
+#define R_TYPE_IS(x, t) ((x)->type == R_TYPE_##t)
+#define R_TYPE_ISNT(x, t) ((x)->type != R_TYPE_##t)
 
 typedef struct R_box {
   char type;

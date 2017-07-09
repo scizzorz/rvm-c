@@ -58,7 +58,7 @@ R_vm *vm_load(FILE *fp) {
   }
 
   for(int i=0; i<this->num_consts; i++) {
-    if(TYPE_IS(&this->consts[i], STR)) {
+    if(R_TYPE_IS(&this->consts[i], STR)) {
       this->consts[i].str = this->strings[this->consts[i].i64];
     }
   }
