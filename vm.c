@@ -39,8 +39,6 @@ bool vm_load(R_vm *this, FILE *fp) {
 
   this->instr_ptr = 0;
   this->stack_ptr = 0;
-  this->stack_size = 10;
-  this->scope_size = 10;
 
   this->consts = GC_realloc(this->consts, sizeof(R_box) * this->num_consts);
   this->instrs = GC_realloc(this->instrs, sizeof(R_op) * this->num_instrs);
@@ -152,16 +150,40 @@ R_box vm_top(R_vm *this) {
   return this->stack[this->stack_ptr - 1];
 }
 
-void vm_push(R_vm *this, R_box *val) {
-  this->stack[this->stack_ptr] = *val;
-  this->stack_ptr += 1;
-}
-
 void vm_set(R_vm *this, R_box *val) {
   this->stack[this->stack_ptr - 1] = *val;
 }
 
 void vm_new_scope(R_vm *this) {
+  if(this->scope_ptr >= this->scope_size) {
+    this->scope_size *= 2;
+    this->scopes = GC_realloc(this->scopes, sizeof(R_box) * this->scope_size);
+  }
+
   R_set_table(&this->scopes[this->scope_ptr]);
   this->scope_ptr += 1;
+}
+
+R_box *vm_alloc(R_vm *this) {
+  if(this->stack_ptr >= this->stack_size) {
+    this->stack_size *= 2;
+    this->stack = GC_realloc(this->stack, sizeof(R_box) * this->stack_size);
+  }
+
+  R_set_null(&this->stack[this->stack_ptr]);
+  this->stack_ptr += 1;
+
+  return &this->stack[this->stack_ptr - 1];
+}
+
+R_box *vm_push(R_vm *this, R_box *val) {
+  if(this->stack_ptr >= this->stack_size) {
+    this->stack_size *= 2;
+    this->stack = GC_realloc(this->stack, sizeof(R_box) * this->stack_size);
+  }
+
+  this->stack[this->stack_ptr] = *val;
+  this->stack_ptr += 1;
+
+  return &this->stack[this->stack_ptr - 1];
 }

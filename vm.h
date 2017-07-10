@@ -37,7 +37,8 @@ bool vm_run(R_vm *this);
 void vm_dump(R_vm *this);
 R_box vm_pop(R_vm *this);
 R_box vm_top(R_vm *this);
-void vm_push(R_vm *this, R_box *val);
+R_box *vm_push(R_vm *this, R_box *val);
+R_box *vm_alloc(R_vm *this);
 void vm_set(R_vm *this, R_box *val);
 void vm_new_scope(R_vm *this);
 
