@@ -80,6 +80,9 @@ bool vm_load(R_vm *this, FILE *fp) {
     return false;
   }
 
+  // create a new global scope
+  vm_new_scope(this);
+
   // adjust string const pointers
   for(int i=prev_consts; i<this->num_consts; i++) {
     if(R_TYPE_IS(&this->consts[i], STR)) {
@@ -91,10 +94,10 @@ bool vm_load(R_vm *this, FILE *fp) {
   for(int i=prev_instrs; i<this->num_instrs; i++) {
     switch(R_OP(&this->instrs[i])) {
       case PUSH_CONST:
-        this->instrs[i].u32 += (prev_consts << 8);
+        this->instrs[i].u32 += prev_consts << 8;
         break;
       case PUSH_SCOPE:
-        this->instrs[i].u32 += (this->scope_ptr << 8);
+        this->instrs[i].u32 += (this->scope_ptr - 1) << 8;
         break;
     }
   }

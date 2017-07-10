@@ -154,7 +154,6 @@ consts = [
 ]
 
 instrs = [
-  NEW_SCOPE,
   PUSH_CONST(1),
   PUSH_CONST(0),
   PUSH_SCOPE(0),
