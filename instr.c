@@ -2,7 +2,7 @@
 
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_PUSH_CONST,
-  R_PRINT_ITEM,
+  R_PRINT,
   R_UN_OP,
   R_BIN_OP,
   R_CMP,
@@ -20,7 +20,7 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
 
 const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "PUSH_CONST",
-  "PRINT_ITEM",
+  "PRINT",
   "UN_OP",
   "BIN_OP",
   "CMP",
@@ -35,7 +35,7 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "NEW_SCOPE",
 };
 
-void R_PRINT_ITEM(R_vm *vm, R_op *instr) {
+void R_PRINT(R_vm *vm, R_op *instr) {
   R_box *val = &vm->stack[vm->stack_ptr - 1];
   R_box_print(val);
 }

@@ -61,7 +61,7 @@ class Op(ct.Structure):
               ('op', ct.c_uint8)]
 
   PUSH_CONST = 0x00
-  PRINT_ITEM = 0x01
+  PRINT      = 0x01
   UN_OP      = 0x02
   BIN_OP     = 0x03
   CMP        = 0x04
@@ -102,7 +102,7 @@ def ui2abc(val):
 
 
 PUSH_CONST = lambda x: Op(Op.PUSH_CONST, *ui2abc(x))
-PRINT_ITEM = Op(Op.PRINT_ITEM, 0, 0, 0)
+PRINT = Op(Op.PRINT, 0, 0, 0)
 ADD = Op(Op.BIN_OP, *ui2abc(Op.BIN_ADD))
 SUB = Op(Op.BIN_OP, *ui2abc(Op.BIN_SUB))
 MUL = Op(Op.BIN_OP, *ui2abc(Op.BIN_MUL))
@@ -161,7 +161,7 @@ instrs = [
   PUSH_CONST(0),
   PUSH_SCOPE(0),
   GET,
-  PRINT_ITEM,
+  PRINT,
 ]
 
 f = Module('main', consts=consts, instrs=instrs)

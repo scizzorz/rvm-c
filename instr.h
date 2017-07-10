@@ -6,7 +6,7 @@
 #define NUM_INSTRS 0x0E
 
 #define PUSH_CONST 0x00
-#define PRINT_ITEM 0x01
+#define PRINT      0x01
 #define UN_OP      0x02
 #define BIN_OP     0x03
 #define CMP        0x04
@@ -36,7 +36,7 @@
 #define UN_NOT     0x01
 
 void R_PUSH_CONST(R_vm *vm, R_op *instr);
-void R_PRINT_ITEM(R_vm *vm, R_op *instr);
+void R_PRINT(R_vm *vm, R_op *instr);
 void R_UN_OP(R_vm *vm, R_op *instr);
 void R_BIN_OP(R_vm *vm, R_op *instr);
 void R_CMP(R_vm *vm, R_op *instr);
