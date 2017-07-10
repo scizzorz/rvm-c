@@ -31,9 +31,13 @@ bool vm_load(R_vm *this, FILE *fp) {
 
   rv = fread(&header, sizeof(R_header), 1, fp);
   if(rv != 1) {
-    fprintf(stderr, "Unable to read num_consts\n");
+    fprintf(stderr, "Unable to read header\n");
     return false;
   }
+
+  int prev_consts = this->num_consts;
+  int prev_instrs = this->num_instrs;
+  int prev_strings = this->num_strings;
 
   this->num_consts += header.num_consts;
   this->num_instrs += header.num_instrs;
@@ -47,7 +51,7 @@ bool vm_load(R_vm *this, FILE *fp) {
   this->strings = GC_realloc(this->strings, sizeof(char *) * this->num_strings);
 
   int len = 0;
-  for(int i=0; i<this->num_strings; i++) {
+  for(int i=prev_strings; i<this->num_strings; i++) {
     rv = fread(&len, sizeof(int), 1, fp);
     if(rv != 1) {
       fprintf(stderr, "Unable to read string %d length\n", i);
@@ -64,22 +68,35 @@ bool vm_load(R_vm *this, FILE *fp) {
     this->strings[i][len] = 0;
   }
 
-  rv = fread(this->consts, sizeof(R_box), this->num_consts, fp);
-  if(rv != this->num_consts) {
+  rv = fread(this->consts + prev_consts, sizeof(R_box), header.num_consts, fp);
+  if(rv != header.num_consts) {
     fprintf(stderr, "Unable to read constants\n");
     return false;
   }
 
-  for(int i=0; i<this->num_consts; i++) {
+  rv = fread(this->instrs + prev_instrs, sizeof(R_op), header.num_instrs, fp);
+  if(rv != header.num_instrs) {
+    fprintf(stderr, "Unable to read instructions\n");
+    return false;
+  }
+
+  // adjust string const pointers
+  for(int i=prev_consts; i<this->num_consts; i++) {
     if(R_TYPE_IS(&this->consts[i], STR)) {
-      this->consts[i].str = this->strings[this->consts[i].i64];
+      this->consts[i].str = this->strings[this->consts[i].i64 + prev_strings];
     }
   }
 
-  rv = fread(this->instrs, sizeof(R_op), this->num_instrs, fp);
-  if(rv != this->num_instrs) {
-    fprintf(stderr, "Unable to read instructions\n");
-    return false;
+  // adjust instruction indices
+  for(int i=prev_instrs; i<this->num_instrs; i++) {
+    switch(R_OP(&this->instrs[i])) {
+      case PUSH_CONST:
+        this->instrs[i].u32 += (prev_consts << 8);
+        break;
+      case PUSH_SCOPE:
+        this->instrs[i].u32 += (this->scope_ptr << 8);
+        break;
+    }
   }
 
   return true;
