@@ -30,29 +30,31 @@ class Box(ct.Structure):
   @classmethod
   def to_rain(cls, val):
     if val is None:
-      return cls.new(cls.null, 0, 0, cls.null)
+      return cls.new(cls.null, 0, 0, cls.nullptr)
     elif val is False:
-      return cls.new(cls.bool, 0, 0, cls.null)
+      return cls.new(cls.bool, 0, 0, cls.nullptr)
     elif val is True:
-      return cls.new(cls.bool, 0, 1, cls.null)
+      return cls.new(cls.bool, 0, 1, cls.nullptr)
     elif isinstance(val, int):
-      return cls.new(cls.int, 0, val, cls.null)
+      return cls.new(cls.int, 0, val, cls.nullptr)
     elif isinstance(val, float):
       raw = struct.pack('d', val)
       intrep = struct.unpack('Q', raw)[0]
-      return cls.new(cls.float, 0, intrep, cls.null)
+      return cls.new(cls.float, 0, intrep, cls.nullptr)
     elif isinstance(val, str):
       idx = len(cls._strings_)
       cls._strings_.append(val)
-      return cls.new(cls.str, len(val), idx, cls.null)
+      return cls.new(cls.str, len(val), idx, cls.nullptr)
 
     raise Exception("Can't convert value {!r} to Rain".format(val))
+
 
 Box._fields_ = [('type', ct.c_uint8),
                 ('size', ct.c_uint32),
                 ('data', ct.c_uint64),
                 ('env', ct.POINTER(Box))]
-Box.null = ct.POINTER(Box)()
+Box.nullptr = ct.POINTER(Box)()
+
 
 class COp(ct.Structure):
   _fields_ = [('a', ct.c_uint8),
