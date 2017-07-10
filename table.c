@@ -1,7 +1,6 @@
 #include "rain.h"
 
 #include <string.h>
-#include <gc.h>
 
 uint64_t R_hash(R_box *val) {
   uint64_t hash = 5381;

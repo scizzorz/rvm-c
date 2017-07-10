@@ -1,5 +1,4 @@
 #include "rain.h"
-#include <gc.h>
 
 R_vm *vm_load(FILE *fp) {
   int rv;
@@ -41,7 +40,7 @@ R_vm *vm_load(FILE *fp) {
       return NULL;
     }
 
-    this->strings[i] = GC_malloc(sizeof(char) * len + 1);
+    this->strings[i] = GC_MALLOC_ATOMIC(sizeof(char) * len + 1);
     rv = fread(this->strings[i], sizeof(char), len, fp);
     if(rv != len) {
       fprintf(stderr, "Unable to read string %d\n", i);

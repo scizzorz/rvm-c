@@ -1,5 +1,4 @@
 #include "rain.h"
-#include <gc.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
