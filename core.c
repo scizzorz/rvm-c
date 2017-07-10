@@ -110,5 +110,19 @@ void R_set_meta(R_box *val, R_box *meta) {
 }
 
 void R_op_print(R_op *instr) {
-  printf("%s (%d | %d)\n", R_INSTR_NAMES[R_OP(instr)], R_SI(instr), R_UI(instr));
+  switch(R_OP(instr)) {
+    case PUSH_CONST:
+    case PUSH_SCOPE:
+    case BIN_OP:
+    case UN_OP:
+    case CMP:
+      printf("%s (%d)\n", R_INSTR_NAMES[R_OP(instr)], R_UI(instr));
+      break;
+    case JUMP:
+    case JUMPIF:
+      printf("%s (%d)\n", R_INSTR_NAMES[R_OP(instr)], R_SI(instr));
+      break;
+    default:
+      printf("%s\n", R_INSTR_NAMES[R_OP(instr)]);
+  }
 }
