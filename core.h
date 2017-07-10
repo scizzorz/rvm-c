@@ -19,9 +19,9 @@
 #define R_TYPE_IS(x, t) ((x)->type == R_TYPE_##t)
 #define R_TYPE_ISNT(x, t) ((x)->type != R_TYPE_##t)
 
-#define R_OP(x) ((x->i32 & 0xFF))
-#define R_SI(x) ((x->i32 >> 8))
-#define R_UI(x) ((x->u32 >> 8))
+#define R_OP(x) ((x)->i32 & 0xFF)
+#define R_SI(x) ((x)->i32 >> 8)
+#define R_UI(x) ((x)->u32 >> 8)
 
 #define R_INIT_TABLE_SIZE 32
 
