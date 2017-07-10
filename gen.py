@@ -131,6 +131,13 @@ class Module:
     self.consts = consts
     self.instrs = instrs
 
+  def add_const(self, val):
+    self.consts.append(Box.to_rain(val))
+    return len(self.consts) - 1
+
+  def add_instr(self, *instrs):
+    self.instrs.extend(instrs)
+
   def write(self):
     with open('{0.name}.rnc'.format(self), 'wb') as fp:
       fp.write(struct.pack('<I', len(self.consts)))
@@ -147,22 +154,38 @@ class Module:
       for instr in self.instrs:
         fp.write(instr)
 
-consts = [
-  Box.to_rain("LOL"),
-  Box.to_rain(10),
-  Box.to_rain(1),
-]
+mod = Module('main')
 
-instrs = [
-  PUSH_CONST(1),
-  PUSH_CONST(0),
-  PUSH_SCOPE(0),
-  SET,
-  PUSH_CONST(0),
-  PUSH_SCOPE(0),
-  GET,
-  PRINT,
-]
+x = mod.add_const('x')
+y = mod.add_const('y')
+z = mod.add_const('z')
+i3 = mod.add_const(3)
+i4 = mod.add_const(4)
 
-f = Module('main', consts=consts, instrs=instrs)
-f.write()
+mod.add_instr(PUSH_CONST(i3),
+              PUSH_CONST(x),
+              PUSH_SCOPE(0),
+              SET,
+              PUSH_CONST(i4),
+              PUSH_CONST(y),
+              PUSH_SCOPE(0),
+              SET,
+              PUSH_CONST(x),
+              PUSH_SCOPE(0),
+              GET,
+              PUSH_CONST(y),
+              PUSH_SCOPE(0),
+              GET,
+              ADD,
+              PUSH_CONST(z),
+              PUSH_SCOPE(0),
+              SET,
+              PUSH_CONST(z),
+              PUSH_SCOPE(0),
+              GET,
+              DUP,
+              ADD,
+              PRINT,
+              )
+
+mod.write()
