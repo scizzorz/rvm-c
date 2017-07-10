@@ -54,7 +54,7 @@ Box._fields_ = [('type', ct.c_uint8),
                 ('env', ct.POINTER(Box))]
 Box.null = ct.POINTER(Box)()
 
-class Op(ct.Structure):
+class COp(ct.Structure):
   _fields_ = [('a', ct.c_uint8),
               ('b', ct.c_uint8),
               ('c', ct.c_uint8),
@@ -91,39 +91,50 @@ class Op(ct.Structure):
   UN_NOT     = 0x01
 
 
-def si2abc(val):
-  b = struct.pack('<i', val)
-  return b[0], b[1], b[2]
+class Op(COp):
+  op = 0xFF
 
+  def __init__(self, a, b, c):
+    super().__init__(self.op, a, b, c)
 
-def ui2abc(val):
-  b = struct.pack('<I', val)
-  return b[0], b[1], b[2]
+class Nx(Op):
+  def __init__(self):
+    super().__init__(0, 0, 0)
 
+class Sx(Op):
+  def __init__(self, x):
+    a, b, c, *_ = struct.pack('<i', x)
+    super().__init__(a, b, c)
 
-PUSH_CONST = lambda x: Op(Op.PUSH_CONST, *ui2abc(x))
-PRINT = Op(Op.PRINT, 0, 0, 0)
-ADD = Op(Op.BIN_OP, *ui2abc(Op.BIN_ADD))
-SUB = Op(Op.BIN_OP, *ui2abc(Op.BIN_SUB))
-MUL = Op(Op.BIN_OP, *ui2abc(Op.BIN_MUL))
-DIV = Op(Op.BIN_OP, *ui2abc(Op.BIN_DIV))
-NEG = Op(Op.UN_OP, *ui2abc(Op.UN_NEG))
-NOT = Op(Op.UN_OP, *ui2abc(Op.UN_NOT))
-LT  = Op(Op.CMP, *ui2abc(Op.CMP_LT))
-GT  = Op(Op.CMP, *ui2abc(Op.CMP_GT))
-LE  = Op(Op.CMP, *ui2abc(Op.CMP_LE))
-GE  = Op(Op.CMP, *ui2abc(Op.CMP_GE))
-EQ  = Op(Op.CMP, *ui2abc(Op.CMP_EQ))
-NE  = Op(Op.CMP, *ui2abc(Op.CMP_NE))
-JUMP = lambda offset: Op(Op.JUMP, *si2abc(offset))
-JUMPIF = lambda offset: Op(Op.JUMPIF, *si2abc(offset))
-DUP = Op(Op.DUP, 0, 0, 0)
-POP = Op(Op.POP, 0, 0, 0)
-SET = Op(Op.SET, 0, 0, 0)
-GET = Op(Op.GET, 0, 0, 0)
-PUSH_TABLE = Op(Op.PUSH_TABLE, 0, 0, 0)
-PUSH_SCOPE = lambda idx: Op(Op.PUSH_SCOPE, *ui2abc(idx))
-NEW_SCOPE = Op(Op.NEW_SCOPE, 0, 0, 0)
+class Sxyz(Op):
+  def __init__(self, x, y, z):
+    a, b, c = map(lambda x: struct.pack('<b', x), (x, y, z))
+    super().__init__(a, b, c)
+
+class Ux(Op):
+  def __init__(self, x):
+    a, b, c, *_ = struct.pack('<I', x)
+    super().__init__(a, b, c)
+
+class Uxyz(Op):
+  def __init__(self, x, y, z):
+    a, b, c = map(lambda x: struct.pack('<B', x), (x, y, z))
+    super().__init__(a, b, c)
+
+class PushConst(Ux): op = COp.PUSH_CONST
+class Print(Nx): op = COp.PRINT
+class BinOp(Ux): op = COp.BIN_OP
+class UnOp(Ux): op = COp.UN_OP
+class Cmp(Ux): op = COp.CMP
+class Jump(Sx): op = COp.JUMP
+class JumpIf(Sx): op = COp.JUMPIF
+class Dup(Nx): op = COp.DUP
+class Pop(Nx): op = COp.POP
+class Set(Nx): op = COp.SET
+class Get(Nx): op = COp.GET
+class PushTable(Nx): op = COp.PUSH_TABLE
+class PushScope(Ux): op = COp.PUSH_SCOPE
+class NewScope(Nx): op = COp.NEW_SCOPE
 
 class Module:
   def __init__(self, name, consts=[], instrs=[]):
@@ -162,30 +173,30 @@ z = mod.add_const('z')
 i3 = mod.add_const(3)
 i4 = mod.add_const(4)
 
-mod.add_instr(PUSH_CONST(i3),
-              PUSH_CONST(x),
-              PUSH_SCOPE(0),
-              SET,
-              PUSH_CONST(i4),
-              PUSH_CONST(y),
-              PUSH_SCOPE(0),
-              SET,
-              PUSH_CONST(x),
-              PUSH_SCOPE(0),
-              GET,
-              PUSH_CONST(y),
-              PUSH_SCOPE(0),
-              GET,
-              ADD,
-              PUSH_CONST(z),
-              PUSH_SCOPE(0),
-              SET,
-              PUSH_CONST(z),
-              PUSH_SCOPE(0),
-              GET,
-              DUP,
-              ADD,
-              PRINT,
+mod.add_instr(PushConst(i3),
+              PushConst(x),
+              PushScope(0),
+              Set(),
+              PushConst(i4),
+              PushConst(y),
+              PushScope(0),
+              Set(),
+              PushConst(x),
+              PushScope(0),
+              Get(),
+              PushConst(y),
+              PushScope(0),
+              Get(),
+              BinOp(COp.BIN_ADD),
+              PushConst(z),
+              PushScope(0),
+              Set(),
+              PushConst(z),
+              PushScope(0),
+              Get(),
+              Dup(),
+              BinOp(COp.BIN_ADD),
+              Print(),
               )
 
 mod.write()
