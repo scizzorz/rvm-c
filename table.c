@@ -65,7 +65,7 @@ void R_table_set_aux(R_box *table, R_box *key, R_box *val, R_item *item) {
 
   while(1) {
     if(items[idx] == NULL) {
-      items[idx] = (item == NULL) ? GC_malloc(sizeof(item)) : item;
+      items[idx] = (item == NULL) ? GC_malloc(sizeof(R_item)) : item;
       items[idx]->hash = key_hash;
       items[idx]->key = *key;
       items[idx]->val = *val;
