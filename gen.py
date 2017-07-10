@@ -157,6 +157,48 @@ class Module:
   def add_instr(self, *instrs):
     self.instrs.extend(instrs)
 
+  def push_const(self, idx):
+    self.instrs.append(PushConst(idx))
+
+  def push_scope(self, idx=0):
+    self.instrs.append(PushScope(idx))
+
+  def push_table(self):
+    self.instrs.append(PushTable())
+
+  def pop(self):
+    self.instrs.append(Pop())
+
+  def dup(self):
+    self.instrs.append(Dup())
+
+  def print(self):
+    self.instrs.append(Print())
+
+  def set(self):
+    self.instrs.append(Set())
+
+  def get(self):
+    self.instrs.append(Get())
+
+  def jump(self, offset):
+    self.instrs.append(Jump(offset))
+
+  def jump_if(self, offset):
+    self.instrs.append(JumpIf(offset))
+
+  def add(self):
+    self.instrs.append(BinOp(Instr.BIN_ADD))
+
+  def sub(self):
+    self.instrs.append(BinOp(Instr.BIN_SUB))
+
+  def mul(self):
+    self.instrs.append(BinOp(Instr.BIN_MUL))
+
+  def div(self):
+    self.instrs.append(BinOp(Instr.BIN_DIV))
+
   def write(self):
     with open('{0.name}.rnc'.format(self), 'wb') as fp:
       fp.write(struct.pack('<I', len(self.consts)))
@@ -181,30 +223,29 @@ z = mod.add_const('z')
 i3 = mod.add_const(3)
 i4 = mod.add_const(4)
 
-mod.add_instr(PushConst(i3),
-              PushConst(x),
-              PushScope(0),
-              Set(),
-              PushConst(i4),
-              PushConst(y),
-              PushScope(0),
-              Set(),
-              PushConst(x),
-              PushScope(0),
-              Get(),
-              PushConst(y),
-              PushScope(0),
-              Get(),
-              BinOp(Instr.BIN_ADD),
-              PushConst(z),
-              PushScope(0),
-              Set(),
-              PushConst(z),
-              PushScope(0),
-              Get(),
-              Dup(),
-              BinOp(Instr.BIN_ADD),
-              Print(),
-              )
+mod.push_const(i3)
+mod.push_const(x)
+mod.push_scope()
+mod.set()
+mod.push_const(i4)
+mod.push_const(y)
+mod.push_scope()
+mod.set()
+mod.push_const(x)
+mod.push_scope()
+mod.get()
+mod.push_const(y)
+mod.push_scope()
+mod.get()
+mod.add()
+mod.push_const(z)
+mod.push_scope()
+mod.set()
+mod.push_const(z)
+mod.push_scope()
+mod.get()
+mod.dup()
+mod.add()
+mod.print()
 
 mod.write()
