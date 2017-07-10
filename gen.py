@@ -56,11 +56,15 @@ Box._fields_ = [('type', ct.c_uint8),
 Box.nullptr = ct.POINTER(Box)()
 
 
-class COp(ct.Structure):
+class Op(ct.Structure):
   _fields_ = [('a', ct.c_uint8),
               ('b', ct.c_uint8),
               ('c', ct.c_uint8),
               ('op', ct.c_uint8)]
+
+
+class Instr(Op):
+  op = 0xFF
 
   PUSH_CONST = 0x00
   PRINT      = 0x01
@@ -92,51 +96,53 @@ class COp(ct.Structure):
   UN_NEG     = 0x00
   UN_NOT     = 0x01
 
-
-class Op(COp):
-  op = 0xFF
-
   def __init__(self, a, b, c):
     super().__init__(self.op, a, b, c)
 
-class Nx(Op):
+
+class Nx(Instr):
   def __init__(self):
     super().__init__(0, 0, 0)
 
-class Sx(Op):
+
+class Sx(Instr):
   def __init__(self, x):
     a, b, c, *_ = struct.pack('<i', x)
     super().__init__(a, b, c)
 
-class Sxyz(Op):
+
+class Sxyz(Instr):
   def __init__(self, x, y, z):
     a, b, c = map(lambda x: struct.pack('<b', x), (x, y, z))
     super().__init__(a, b, c)
 
-class Ux(Op):
+
+class Ux(Instr):
   def __init__(self, x):
     a, b, c, *_ = struct.pack('<I', x)
     super().__init__(a, b, c)
 
-class Uxyz(Op):
+
+class Uxyz(Instr):
   def __init__(self, x, y, z):
     a, b, c = map(lambda x: struct.pack('<B', x), (x, y, z))
     super().__init__(a, b, c)
 
-class PushConst(Ux): op = COp.PUSH_CONST
-class Print(Nx): op = COp.PRINT
-class BinOp(Ux): op = COp.BIN_OP
-class UnOp(Ux): op = COp.UN_OP
-class Cmp(Ux): op = COp.CMP
-class Jump(Sx): op = COp.JUMP
-class JumpIf(Sx): op = COp.JUMPIF
-class Dup(Nx): op = COp.DUP
-class Pop(Nx): op = COp.POP
-class Set(Nx): op = COp.SET
-class Get(Nx): op = COp.GET
-class PushTable(Nx): op = COp.PUSH_TABLE
-class PushScope(Ux): op = COp.PUSH_SCOPE
-class NewScope(Nx): op = COp.NEW_SCOPE
+
+class PushConst(Ux): op = Instr.PUSH_CONST
+class Print(Nx): op = Instr.PRINT
+class BinOp(Ux): op = Instr.BIN_OP
+class UnOp(Ux): op = Instr.UN_OP
+class Cmp(Ux): op = Instr.CMP
+class Jump(Sx): op = Instr.JUMP
+class JumpIf(Sx): op = Instr.JUMPIF
+class Dup(Nx): op = Instr.DUP
+class Pop(Nx): op = Instr.POP
+class Set(Nx): op = Instr.SET
+class Get(Nx): op = Instr.GET
+class PushTable(Nx): op = Instr.PUSH_TABLE
+class PushScope(Ux): op = Instr.PUSH_SCOPE
+class NewScope(Nx): op = Instr.NEW_SCOPE
 
 class Module:
   def __init__(self, name, consts=[], instrs=[]):
@@ -189,7 +195,7 @@ mod.add_instr(PushConst(i3),
               PushConst(y),
               PushScope(0),
               Get(),
-              BinOp(COp.BIN_ADD),
+              BinOp(Instr.BIN_ADD),
               PushConst(z),
               PushScope(0),
               Set(),
@@ -197,7 +203,7 @@ mod.add_instr(PushConst(i3),
               PushScope(0),
               Get(),
               Dup(),
-              BinOp(COp.BIN_ADD),
+              BinOp(Instr.BIN_ADD),
               Print(),
               )
 
