@@ -36,8 +36,8 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
 };
 
 void R_PRINT(R_vm *vm, R_op *instr) {
-  R_box *val = &vm->stack[vm->stack_ptr - 1];
-  R_box_print(val);
+  R_box val = vm_pop(vm);
+  R_box_print(&val);
 }
 
 
