@@ -15,10 +15,13 @@ int main(int argv, char **argc) {
   }
 
   R_vm *this = vm_new();
-  vm_load(this, fp);
-
   if(this == NULL) {
-    fprintf(stderr, "Unable to load VM\n");
+    fprintf(stderr, "Unable to create VM\n");
+    return 1;
+  }
+
+  if(!vm_load(this, fp)) {
+    fprintf(stderr, "Unable to load bytecode\n");
     return 1;
   }
 
