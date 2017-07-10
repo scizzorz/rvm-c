@@ -3,7 +3,7 @@
 
 #include "rain.h"
 
-#define NUM_INSTRS 0x09
+#define NUM_INSTRS 0x0C
 
 #define PUSH_CONST 0x00
 #define PRINT_ITEM 0x01
@@ -14,6 +14,9 @@
 #define JUMPIF     0x06
 #define DUP        0x07
 #define POP        0x08
+#define SET        0x09
+#define GET        0x0A
+#define PUSH_TABLE 0x0B
 
 #define CMP_LT     0x00
 #define CMP_LE     0x01
@@ -39,6 +42,9 @@ void R_JUMP(R_vm *vm, R_op *instr);
 void R_JUMPIF(R_vm *vm, R_op *instr);
 void R_DUP(R_vm *vm, R_op *instr);
 void R_POP(R_vm *vm, R_op *instr);
+void R_SET(R_vm *vm, R_op *instr);
+void R_GET(R_vm *vm, R_op *instr);
+void R_PUSH_TABLE(R_vm *vm, R_op *instr);
 
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *);
 

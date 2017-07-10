@@ -69,6 +69,9 @@ class Op(ct.Structure):
   JUMPIF     = 0x06
   DUP        = 0x07
   POP        = 0x08
+  SET        = 0x09
+  GET        = 0x0A
+  PUSH_TABLE = 0x0B
 
   CMP_LT     = 0x00
   CMP_LE     = 0x01
@@ -114,6 +117,9 @@ JUMP = lambda offset: Op(Op.JUMP, *si2abc(offset))
 JUMPIF = lambda offset: Op(Op.JUMPIF, *si2abc(offset))
 DUP = Op(Op.DUP, 0, 0, 0)
 POP = Op(Op.POP, 0, 0, 0)
+SET = Op(Op.SET, 0, 0, 0)
+GET = Op(Op.GET, 0, 0, 0)
+PUSH_TABLE = Op(Op.PUSH_TABLE, 0, 0, 0)
 
 class Module:
   def __init__(self, name, consts=[], instrs=[]):
@@ -138,30 +144,13 @@ class Module:
         fp.write(instr)
 
 consts = [
-  Box.to_rain(0),
-  Box.to_rain(1),
-  Box.to_rain(10),
+  Box.to_rain("_G"),
   Box.to_rain("LOL"),
+  Box.to_rain(10),
+  Box.to_rain(1),
 ]
 
-# PUSH 0 (0)
-# PUSH 1 (1)
-# ADD
-# DUP
-# PUSH 2 (10)
-# NE
-# JUMPIF 0 -5
-
 instrs = [
-  PUSH_CONST(0),
-  PUSH_CONST(1),
-  ADD,
-  PRINT_ITEM,
-  DUP,
-  PUSH_CONST(2),
-  NE,
-  JUMPIF(-7),
-  PRINT_ITEM,
 ]
 
 f = Module('main', consts=consts, instrs=instrs)

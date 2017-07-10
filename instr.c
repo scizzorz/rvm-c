@@ -10,6 +10,9 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_JUMPIF,
   R_DUP,
   R_POP,
+  R_SET,
+  R_GET,
+  R_PUSH_TABLE,
 };
 
 
@@ -23,10 +26,13 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "JUMPIF",
   "DUP",
   "POP",
+  "SET",
+  "GET",
+  "PUSH_TABLE",
 };
 
 void R_PRINT_ITEM(R_vm *vm, R_op *instr) {
-  R_box *val = vm->stack + vm->stack_ptr - 1;
+  R_box *val = &vm->stack[vm->stack_ptr - 1];
   R_box_print(val);
 }
 
@@ -42,7 +48,7 @@ void R_UN_OP(R_vm *vm, R_op *instr) {
 void R_BIN_OP(R_vm *vm, R_op *instr) {
   R_box lhs = vm_pop(vm);
   R_box rhs = vm_top(vm);
-  R_box *top = vm->stack + vm->stack_ptr - 1;
+  R_box *top = &vm->stack[vm->stack_ptr - 1];
   bool do_float = false;
   double lhs_f, rhs_f;
 
@@ -87,7 +93,7 @@ void R_BIN_OP(R_vm *vm, R_op *instr) {
 void R_CMP(R_vm *vm, R_op *instr) {
   R_box lhs = vm_pop(vm);
   R_box rhs = vm_top(vm);
-  R_box *top = vm->stack + vm->stack_ptr - 1;
+  R_box *top = &vm->stack[vm->stack_ptr - 1];
 
   if(lhs.type != rhs.type) {
     R_set_bool(top, false);
@@ -150,11 +156,33 @@ void R_JUMPIF(R_vm *vm, R_op *instr) {
 
 
 void R_DUP(R_vm *vm, R_op *instr) {
-  R_box *top = vm->stack + vm->stack_ptr - 1;
+  R_box *top = &vm->stack[vm->stack_ptr - 1];
   vm_push(vm, top);
 }
 
 
 void R_POP(R_vm *vm, R_op *instr) {
   vm_pop(vm);
+}
+
+
+void R_SET(R_vm *vm, R_op *instr) {
+  R_box table = vm_pop(vm);
+  R_box key = vm_pop(vm);
+  R_box val = vm_pop(vm);
+  R_box_print(&key);
+  R_table_set(&table, &key, &val);
+  R_box_print(&key);
+}
+
+
+void R_GET(R_vm *vm, R_op *instr) {
+  R_box table = vm_pop(vm);
+  R_box key = vm_top(vm);
+  R_box *top = &vm->stack[vm->stack_ptr - 1];
+}
+
+void R_PUSH_TABLE(R_vm *vm, R_op *instr) {
+  R_set_table(&vm->stack[vm->stack_ptr]);
+  vm->stack_ptr += 1;
 }
