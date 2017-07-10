@@ -52,8 +52,8 @@ bool vm_load(R_vm *this, FILE *fp) {
       return false;
     }
 
-    this->strings[i] = GC_MALLOC_ATOMIC(sizeof(char) * len + 1);
-    rv = fread(this->strings[i], sizeof(char), len, fp);
+    this->strings[i] = GC_malloc_atomic(len + 1);
+    rv = fread(this->strings[i], 1, len, fp);
     if(rv != len) {
       fprintf(stderr, "Unable to read string %d\n", i);
       return false;
