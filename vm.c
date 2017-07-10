@@ -1,6 +1,8 @@
 #include "rain.h"
 
 R_vm *vm_new() {
+  GC_init();
+
   R_vm *this = GC_malloc(sizeof(R_vm));
 
   this->num_consts = 0;
