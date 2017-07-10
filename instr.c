@@ -13,6 +13,8 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_SET,
   R_GET,
   R_PUSH_TABLE,
+  R_PUSH_SCOPE,
+  R_NEW_SCOPE,
 };
 
 
@@ -29,6 +31,8 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "SET",
   "GET",
   "PUSH_TABLE",
+  "PUSH_SCOPE",
+  "NEW_SCOPE",
 };
 
 void R_PRINT_ITEM(R_vm *vm, R_op *instr) {
@@ -38,8 +42,11 @@ void R_PRINT_ITEM(R_vm *vm, R_op *instr) {
 
 
 void R_PUSH_CONST(R_vm *vm, R_op *instr) {
-  vm->stack[vm->stack_ptr] = vm->consts[R_UI(instr)];
-  vm->stack_ptr += 1;
+  vm_push(vm, &vm->consts[R_UI(instr)]);
+}
+
+void R_PUSH_SCOPE(R_vm *vm, R_op *instr) {
+  vm_push(vm, &vm->scopes[R_UI(instr)]);
 }
 
 void R_UN_OP(R_vm *vm, R_op *instr) {
@@ -170,9 +177,7 @@ void R_SET(R_vm *vm, R_op *instr) {
   R_box table = vm_pop(vm);
   R_box key = vm_pop(vm);
   R_box val = vm_pop(vm);
-  R_box_print(&key);
   R_table_set(&table, &key, &val);
-  R_box_print(&key);
 }
 
 
@@ -180,9 +185,21 @@ void R_GET(R_vm *vm, R_op *instr) {
   R_box table = vm_pop(vm);
   R_box key = vm_top(vm);
   R_box *top = &vm->stack[vm->stack_ptr - 1];
+  R_box *res = R_table_get(&table, &key);
+
+  if(res == NULL) {
+    R_set_null(top);
+    return;
+  }
+
+  *top = *res;
 }
 
 void R_PUSH_TABLE(R_vm *vm, R_op *instr) {
   R_set_table(&vm->stack[vm->stack_ptr]);
   vm->stack_ptr += 1;
+}
+
+void R_NEW_SCOPE(R_vm *vm, R_op *instr) {
+  vm_new_scope(vm);
 }

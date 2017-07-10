@@ -26,11 +26,13 @@ R_vm *vm_load(FILE *fp) {
   this->instr_ptr = 0;
   this->stack_ptr = 0;
   this->stack_size = 10;
+  this->scope_size = 10;
 
   this->stack = GC_malloc(sizeof(R_box) * this->stack_size);
   this->strings = GC_malloc(sizeof(char *) * this->num_strings);
   this->consts = GC_malloc(sizeof(R_box) * this->num_consts);
   this->instrs = GC_malloc(sizeof(R_op) * this->num_instrs);
+  this->scopes = GC_malloc(sizeof(R_box) * this->scope_size);
 
   int len = 0;
   for(int i=0; i<this->num_strings; i++) {
@@ -145,4 +147,9 @@ void vm_push(R_vm *this, R_box *val) {
 
 void vm_set(R_vm *this, R_box *val) {
   this->stack[this->stack_ptr - 1] = *val;
+}
+
+void vm_new_scope(R_vm *this) {
+  R_set_table(&this->scopes[this->scope_ptr]);
+  this->scope_ptr += 1;
 }

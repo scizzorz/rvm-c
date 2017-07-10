@@ -72,6 +72,8 @@ class Op(ct.Structure):
   SET        = 0x09
   GET        = 0x0A
   PUSH_TABLE = 0x0B
+  PUSH_SCOPE = 0x0C
+  NEW_SCOPE  = 0x0D
 
   CMP_LT     = 0x00
   CMP_LE     = 0x01
@@ -120,6 +122,8 @@ POP = Op(Op.POP, 0, 0, 0)
 SET = Op(Op.SET, 0, 0, 0)
 GET = Op(Op.GET, 0, 0, 0)
 PUSH_TABLE = Op(Op.PUSH_TABLE, 0, 0, 0)
+PUSH_SCOPE = lambda idx: Op(Op.PUSH_SCOPE, *ui2abc(idx))
+NEW_SCOPE = Op(Op.NEW_SCOPE, 0, 0, 0)
 
 class Module:
   def __init__(self, name, consts=[], instrs=[]):
@@ -144,13 +148,21 @@ class Module:
         fp.write(instr)
 
 consts = [
-  Box.to_rain("_G"),
   Box.to_rain("LOL"),
   Box.to_rain(10),
   Box.to_rain(1),
 ]
 
 instrs = [
+  NEW_SCOPE,
+  PUSH_CONST(1),
+  PUSH_CONST(0),
+  PUSH_SCOPE(0),
+  SET,
+  PUSH_CONST(0),
+  PUSH_SCOPE(0),
+  GET,
+  PRINT_ITEM,
 ]
 
 f = Module('main', consts=consts, instrs=instrs)
