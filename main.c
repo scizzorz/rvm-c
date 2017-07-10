@@ -14,7 +14,8 @@ int main(int argv, char **argc) {
     return 1;
   }
 
-  R_vm *this = vm_load(fp);
+  R_vm *this = vm_new();
+  vm_load(this, fp);
 
   if(this == NULL) {
     fprintf(stderr, "Unable to load VM\n");

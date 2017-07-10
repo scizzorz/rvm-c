@@ -2,16 +2,25 @@
 #define R_VM_H
 
 #include "rain.h"
+#include <stdbool.h>
+
+typedef struct R_header {
+  uint32_t num_consts;
+  uint32_t num_instrs;
+  uint32_t num_strings;
+} R_header;
 
 typedef struct R_vm {
   uint32_t instr_ptr;
   uint32_t num_consts;
   uint32_t num_instrs;
   uint32_t num_strings;
+
   uint32_t stack_ptr;
   uint32_t stack_size;
-  uint32_t scope_size;
+
   uint32_t scope_ptr;
+  uint32_t scope_size;
 
   char **strings;
   R_box *consts;
@@ -20,7 +29,8 @@ typedef struct R_vm {
   R_box *scopes;
 } R_vm;
 
-R_vm *vm_load(FILE *fp);
+R_vm *vm_new();
+bool vm_load(R_vm *this, FILE *fp);
 bool vm_exec(R_vm *this, R_op *instr);
 bool vm_step(R_vm *this);
 bool vm_run(R_vm *this);

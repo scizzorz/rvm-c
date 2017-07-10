@@ -1,52 +1,64 @@
 #include "rain.h"
 
-R_vm *vm_load(FILE *fp) {
-  int rv;
-
+R_vm *vm_new() {
   R_vm *this = GC_malloc(sizeof(R_vm));
 
-  rv = fread(&this->num_consts, sizeof(int), 1, fp);
-  if(rv != 1) {
-    fprintf(stderr, "Unable to read num_consts\n");
-    return NULL;
-  }
-
-  rv = fread(&this->num_instrs, sizeof(int), 1, fp);
-  if(rv != 1) {
-    fprintf(stderr, "Unable to read num_instrs\n");
-    return NULL;
-  }
-
-  rv = fread(&this->num_strings, sizeof(int), 1, fp);
-  if(rv != 1) {
-    fprintf(stderr, "Unable to read num_strings\n");
-    return NULL;
-  }
+  this->num_consts = 0;
+  this->num_instrs = 0;
+  this->num_strings = 0;
 
   this->instr_ptr = 0;
   this->stack_ptr = 0;
   this->stack_size = 10;
   this->scope_size = 10;
 
+  this->consts = GC_malloc(sizeof(R_box));
+  this->instrs = GC_malloc(sizeof(R_op));
+  this->strings = GC_malloc(sizeof(char *));
+
   this->stack = GC_malloc(sizeof(R_box) * this->stack_size);
-  this->strings = GC_malloc(sizeof(char *) * this->num_strings);
-  this->consts = GC_malloc(sizeof(R_box) * this->num_consts);
-  this->instrs = GC_malloc(sizeof(R_op) * this->num_instrs);
   this->scopes = GC_malloc(sizeof(R_box) * this->scope_size);
+
+  return this;
+}
+
+bool vm_load(R_vm *this, FILE *fp) {
+  int rv;
+
+  R_header header;
+
+  rv = fread(&header, sizeof(R_header), 1, fp);
+  if(rv != 1) {
+    fprintf(stderr, "Unable to read num_consts\n");
+    return false;
+  }
+
+  this->num_consts += header.num_consts;
+  this->num_instrs += header.num_instrs;
+  this->num_strings += header.num_strings;
+
+  this->instr_ptr = 0;
+  this->stack_ptr = 0;
+  this->stack_size = 10;
+  this->scope_size = 10;
+
+  this->consts = GC_realloc(this->consts, sizeof(R_box) * this->num_consts);
+  this->instrs = GC_realloc(this->instrs, sizeof(R_op) * this->num_instrs);
+  this->strings = GC_realloc(this->strings, sizeof(char *) * this->num_strings);
 
   int len = 0;
   for(int i=0; i<this->num_strings; i++) {
     rv = fread(&len, sizeof(int), 1, fp);
     if(rv != 1) {
       fprintf(stderr, "Unable to read string %d length\n", i);
-      return NULL;
+      return false;
     }
 
     this->strings[i] = GC_MALLOC_ATOMIC(sizeof(char) * len + 1);
     rv = fread(this->strings[i], sizeof(char), len, fp);
     if(rv != len) {
       fprintf(stderr, "Unable to read string %d\n", i);
-      return NULL;
+      return false;
     }
 
     this->strings[i][len] = 0;
@@ -55,7 +67,7 @@ R_vm *vm_load(FILE *fp) {
   rv = fread(this->consts, sizeof(R_box), this->num_consts, fp);
   if(rv != this->num_consts) {
     fprintf(stderr, "Unable to read constants\n");
-    return NULL;
+    return false;
   }
 
   for(int i=0; i<this->num_consts; i++) {
@@ -67,10 +79,10 @@ R_vm *vm_load(FILE *fp) {
   rv = fread(this->instrs, sizeof(R_op), this->num_instrs, fp);
   if(rv != this->num_instrs) {
     fprintf(stderr, "Unable to read instructions\n");
-    return NULL;
+    return false;
   }
 
-  return this;
+  return true;
 }
 
 bool vm_exec(R_vm *this, R_op *instr) {
