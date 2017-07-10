@@ -26,10 +26,14 @@ int main(int argv, char **argc) {
   }
 
   vm_dump(this);
+  printf("--------\n");
 
-  printf("--------\n");
-  vm_run(this);
-  printf("--------\n");
+  vm_call(this, 0);
+
+  do {
+    vm_dump(this);
+    printf("--------\n");
+  } while(vm_step(this));
 
   vm_dump(this);
 

@@ -10,6 +10,10 @@ typedef struct R_header {
   uint32_t num_strings;
 } R_header;
 
+typedef struct R_frame {
+  uint32_t instr_ptr;
+} R_frame;
+
 typedef struct R_vm {
   uint32_t instr_ptr;
   uint32_t num_consts;
@@ -22,11 +26,15 @@ typedef struct R_vm {
   uint32_t scope_ptr;
   uint32_t scope_size;
 
+  uint32_t frame_ptr;
+  uint32_t frame_size;
+
   char **strings;
   R_box *consts;
   R_op *instrs;
   R_box *stack;
   R_box *scopes;
+  R_frame *frames;
 } R_vm;
 
 R_vm *vm_new();
@@ -41,5 +49,7 @@ R_box *vm_push(R_vm *this, R_box *val);
 R_box *vm_alloc(R_vm *this);
 void vm_set(R_vm *this, R_box *val);
 void vm_new_scope(R_vm *this);
+void vm_call(R_vm *this, uint32_t to);
+void vm_ret(R_vm *this);
 
 #endif

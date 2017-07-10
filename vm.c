@@ -1,5 +1,7 @@
 #include "rain.h"
 
+#include <limits.h>
+
 R_vm *vm_new() {
   GC_init();
 
@@ -9,10 +11,14 @@ R_vm *vm_new() {
   this->num_instrs = 0;
   this->num_strings = 0;
 
-  this->instr_ptr = 0;
+  this->instr_ptr = UINT32_MAX - 1;
   this->stack_ptr = 0;
+  this->scope_ptr = 0;
+  this->frame_ptr = 0;
+
   this->stack_size = 10;
   this->scope_size = 10;
+  this->frame_size = 10;
 
   this->consts = GC_malloc(sizeof(R_box));
   this->instrs = GC_malloc(sizeof(R_op));
@@ -20,6 +26,7 @@ R_vm *vm_new() {
 
   this->stack = GC_malloc(sizeof(R_box) * this->stack_size);
   this->scopes = GC_malloc(sizeof(R_box) * this->scope_size);
+  this->frames = GC_malloc(sizeof(R_frame) * this->frame_size);
 
   return this;
 }
@@ -42,9 +49,6 @@ bool vm_load(R_vm *this, FILE *fp) {
   this->num_consts += header.num_consts;
   this->num_instrs += header.num_instrs;
   this->num_strings += header.num_strings;
-
-  this->instr_ptr = 0;
-  this->stack_ptr = 0;
 
   this->consts = GC_realloc(this->consts, sizeof(R_box) * this->num_consts);
   this->instrs = GC_realloc(this->instrs, sizeof(R_op) * this->num_instrs);
@@ -143,23 +147,35 @@ void vm_dump(R_vm *this) {
 
   printf("Instructions (%d):\n", this->num_instrs);
   for(int i=0; i<this->num_instrs; i++) {
-    printf(i == this->instr_ptr ? "-> " : "   ");
+    printf("%02x", i);
+    printf(i == this->instr_ptr ? " > " : "   ");
     R_op_print(this->instrs + i);
   }
 
   printf("Stack (%d / %d):\n", this->stack_ptr, this->stack_size);
   for(int i=0; i<this->stack_size; i++) {
     if(i + 1 > this->stack_ptr) {
-      printf("       ");
+      printf("     ");
     }
     else if(i + 1 == this->stack_ptr) {
-      printf("[% 2d] > ", i);
+      printf("% 2d > ", i);
     }
     else {
-      printf("[% 2d]   ", i);
+      printf("% 2d   ", i);
     }
 
     R_box_print(this->stack + i);
+  }
+
+  printf("Frames (%d / %d):\n", this->frame_ptr, this->frame_size);
+  for(int i=0; i<this->frame_ptr; i++) {
+    printf("%02x    ", this->frames[i].instr_ptr);
+    if(this->frames[i].instr_ptr < this->num_instrs) {
+      R_op_print(this->instrs + this->frames[i].instr_ptr);
+    }
+    else {
+      printf("???\n");
+    }
   }
 }
 
@@ -208,4 +224,15 @@ R_box *vm_push(R_vm *this, R_box *val) {
   this->stack_ptr += 1;
 
   return &this->stack[this->stack_ptr - 1];
+}
+
+void vm_call(R_vm *this, uint32_t to) {
+  this->frames[this->frame_ptr].instr_ptr = this->instr_ptr;
+  this->frame_ptr += 1;
+  this->instr_ptr = to;
+}
+
+void vm_ret(R_vm *this) {
+  this->frame_ptr -= 1;
+  this->instr_ptr = this->frames[this->frame_ptr].instr_ptr;
 }

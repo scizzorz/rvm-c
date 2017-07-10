@@ -3,7 +3,7 @@
 
 #include "rain.h"
 
-#define NUM_INSTRS 0x0E
+#define NUM_INSTRS 0x10
 
 #define PUSH_CONST 0x00
 #define PRINT      0x01
@@ -19,6 +19,8 @@
 #define PUSH_TABLE 0x0B
 #define PUSH_SCOPE 0x0C
 #define NEW_SCOPE  0x0D
+#define CALLTO     0x0E
+#define RETURN     0x0F
 
 #define CMP_LT     0x00
 #define CMP_LE     0x01
@@ -49,6 +51,8 @@ void R_GET(R_vm *vm, R_op *instr);
 void R_PUSH_TABLE(R_vm *vm, R_op *instr);
 void R_PUSH_SCOPE(R_vm *vm, R_op *instr);
 void R_NEW_SCOPE(R_vm *vm, R_op *instr);
+void R_CALLTO(R_vm *vm, R_op *instr);
+void R_RETURN(R_vm *vm, R_op *instr);
 
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *);
 

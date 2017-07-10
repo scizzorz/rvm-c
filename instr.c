@@ -15,6 +15,8 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_PUSH_TABLE,
   R_PUSH_SCOPE,
   R_NEW_SCOPE,
+  R_CALLTO,
+  R_RETURN,
 };
 
 
@@ -33,6 +35,8 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "PUSH_TABLE",
   "PUSH_SCOPE",
   "NEW_SCOPE",
+  "CALLTO",
+  "RETURN",
 };
 
 void R_PRINT(R_vm *vm, R_op *instr) {
@@ -149,6 +153,7 @@ void R_CMP(R_vm *vm, R_op *instr) {
 
 
 void R_JUMP(R_vm *vm, R_op *instr) {
+  vm->instr_ptr += R_SI(instr);
 }
 
 
@@ -202,4 +207,12 @@ void R_PUSH_TABLE(R_vm *vm, R_op *instr) {
 
 void R_NEW_SCOPE(R_vm *vm, R_op *instr) {
   vm_new_scope(vm);
+}
+
+void R_CALLTO(R_vm *vm, R_op *instr) {
+  vm_call(vm, R_UI(instr) - 1);
+}
+
+void R_RETURN(R_vm *vm, R_op *instr) {
+  vm_ret(vm);
 }

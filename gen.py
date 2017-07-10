@@ -80,6 +80,8 @@ class Instr(Op):
   PUSH_TABLE = 0x0B
   PUSH_SCOPE = 0x0C
   NEW_SCOPE  = 0x0D
+  CALLTO     = 0x0E
+  RETURN     = 0x0F
 
   CMP_LT     = 0x00
   CMP_LE     = 0x01
@@ -143,6 +145,8 @@ class Get(Nx): op = Instr.GET
 class PushTable(Nx): op = Instr.PUSH_TABLE
 class PushScope(Ux): op = Instr.PUSH_SCOPE
 class NewScope(Nx): op = Instr.NEW_SCOPE
+class CallTo(Ux): op = Instr.CALLTO
+class Return(Nx): op = Instr.RETURN
 
 class Module:
   def __init__(self, name, consts=[], instrs=[]):
@@ -187,6 +191,12 @@ class Module:
   def jump_if(self, offset):
     self.instrs.append(JumpIf(offset))
 
+  def call_to(self, instr):
+    self.instrs.append(CallTo(instr))
+
+  def ret(self):
+    self.instrs.append(Return())
+
   def add(self):
     self.instrs.append(BinOp(Instr.BIN_ADD))
 
@@ -223,29 +233,14 @@ z = mod.add_const('z')
 i3 = mod.add_const(3)
 i4 = mod.add_const(4)
 
+mod.jump(5)
 mod.push_const(i3)
-mod.push_const(x)
-mod.push_scope()
-mod.set()
 mod.push_const(i4)
-mod.push_const(y)
-mod.push_scope()
-mod.set()
+mod.add()
+mod.print()
+mod.ret()
+mod.call_to(1)
 mod.push_const(x)
-mod.push_scope()
-mod.get()
-mod.push_const(y)
-mod.push_scope()
-mod.get()
-mod.add()
-mod.push_const(z)
-mod.push_scope()
-mod.set()
-mod.push_const(z)
-mod.push_scope()
-mod.get()
-mod.dup()
-mod.add()
 mod.print()
 
 mod.write()
