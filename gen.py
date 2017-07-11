@@ -12,6 +12,9 @@ class Box(ct.Structure):
   cdata = 7
 
   _saves_ = []
+
+  # strings should be saved on Module, not Box
+  # right now, every Module produced writes the whole set of strings
   _strings_ = []
 
   def __str__(self):
@@ -149,7 +152,13 @@ class CallTo(Ux): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
 
 class Module:
-  def __init__(self, name, consts=[], instrs=[]):
+  def __init__(self, name, consts=None, instrs=None):
+    if consts is None:
+      consts = []
+
+    if instrs is None:
+      instrs = []
+
     self.name = name
     self.consts = consts
     self.instrs = instrs
