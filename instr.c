@@ -17,6 +17,7 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_NEW_SCOPE,
   R_CALLTO,
   R_RETURN,
+  R_IMPORT,
 };
 
 
@@ -37,6 +38,7 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "NEW_SCOPE",
   "CALLTO",
   "RETURN",
+  "IMPORT",
 };
 
 void R_PRINT(R_vm *vm, R_op *instr) {
@@ -215,4 +217,12 @@ void R_CALLTO(R_vm *vm, R_op *instr) {
 
 void R_RETURN(R_vm *vm, R_op *instr) {
   vm_ret(vm);
+}
+
+void R_IMPORT(R_vm *vm, R_op *instr) {
+  R_box pop = vm_pop(vm);
+  if(R_TYPE_IS(&pop, STR)) {
+    vm_import(vm, pop.str);
+    vm->instr_ptr -= 1;
+  }
 }

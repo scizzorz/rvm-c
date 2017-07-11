@@ -128,6 +128,9 @@ bool vm_load(R_vm *this, FILE *fp) {
       case PUSH_SCOPE:
         this->instrs[i].u32 += (this->scope_ptr - 1) << 8;
         break;
+      case CALLTO:
+        this->instrs[i].u32 += prev_instrs << 8;
+        break;
     }
   }
 

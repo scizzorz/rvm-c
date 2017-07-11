@@ -85,6 +85,7 @@ class Instr(Op):
   NEW_SCOPE  = 0x0D
   CALLTO     = 0x0E
   RETURN     = 0x0F
+  IMPORT     = 0x10
 
   CMP_LT     = 0x00
   CMP_LE     = 0x01
@@ -150,6 +151,7 @@ class PushScope(Ux): op = Instr.PUSH_SCOPE
 class NewScope(Nx): op = Instr.NEW_SCOPE
 class CallTo(Ux): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
+class Import(Nx): op = Instr.IMPORT
 
 class Module:
   def __init__(self, name, consts=None, instrs=None):
@@ -206,6 +208,9 @@ class Module:
   def ret(self):
     self.instrs.append(Return())
 
+  def imp(self):
+    self.instrs.append(Import())
+
   def add(self):
     self.instrs.append(BinOp(Instr.BIN_ADD))
 
@@ -234,22 +239,34 @@ class Module:
       for instr in self.instrs:
         fp.write(instr)
 
-mod = Module('main')
+main = Module('main')
 
-x = mod.add_const('x')
-y = mod.add_const('y')
-z = mod.add_const('z')
-i3 = mod.add_const(3)
-i4 = mod.add_const(4)
+x = main.add_const('x')
+y = main.add_const('y')
+z = main.add_const('z')
+i3 = main.add_const(3)
+i4 = main.add_const(4)
 
-mod.jump(5)
-mod.push_const(i3)
-mod.push_const(i4)
-mod.add()
-mod.print()
-mod.ret()
-mod.call_to(1)
-mod.push_const(x)
-mod.print()
+main.call_to(2)
+main.ret()
 
-mod.write()
+main.push_const(i3)
+main.push_const(i4)
+main.add()
+main.print()
+main.ret()
+
+main.write()
+
+test = Module('test')
+
+hello = test.add_const('Hello, world!')
+main_f = test.add_const('main.rnc')
+
+test.push_const(hello)
+test.print()
+test.push_const(main_f)
+test.imp()
+test.ret()
+
+test.write()

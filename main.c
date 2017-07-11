@@ -15,12 +15,13 @@ int main(int argv, char **argc) {
 
   vm_import(this, argc[1]);
 
+  uint32_t i = 0;
   vm_dump(this);
-  printf("--------\n");
+  printf("% 3d --------\n", i);
 
   do {
-    //vm_dump(this);
-    //printf("--------\n");
+    vm_dump(this);
+    printf("% 3d --------\n", ++i);
   } while(vm_step(this));
 
   return 0;
