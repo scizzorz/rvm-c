@@ -33,27 +33,31 @@ R_vm *vm_new() {
 
 bool vm_load(R_vm *this, FILE *fp) {
   int rv;
-
   R_header header;
 
+  // save previous counts
+  int prev_consts = this->num_consts;
+  int prev_instrs = this->num_instrs;
+  int prev_strings = this->num_strings;
+
+  // read header information
   rv = fread(&header, sizeof(R_header), 1, fp);
   if(rv != 1) {
     fprintf(stderr, "Unable to read header\n");
     return false;
   }
 
-  int prev_consts = this->num_consts;
-  int prev_instrs = this->num_instrs;
-  int prev_strings = this->num_strings;
-
+  // increment counts
   this->num_consts += header.num_consts;
   this->num_instrs += header.num_instrs;
   this->num_strings += header.num_strings;
 
+  // resize arrays
   this->consts = GC_realloc(this->consts, sizeof(R_box) * this->num_consts);
   this->instrs = GC_realloc(this->instrs, sizeof(R_op) * this->num_instrs);
   this->strings = GC_realloc(this->strings, sizeof(char *) * this->num_strings);
 
+  // read all strings
   int len = 0;
   for(int i=prev_strings; i<this->num_strings; i++) {
     rv = fread(&len, sizeof(int), 1, fp);
@@ -72,12 +76,14 @@ bool vm_load(R_vm *this, FILE *fp) {
     this->strings[i][len] = 0;
   }
 
+  // read all constants
   rv = fread(this->consts + prev_consts, sizeof(R_box), header.num_consts, fp);
   if(rv != header.num_consts) {
     fprintf(stderr, "Unable to read constants\n");
     return false;
   }
 
+  // read all instructions
   rv = fread(this->instrs + prev_instrs, sizeof(R_op), header.num_instrs, fp);
   if(rv != header.num_instrs) {
     fprintf(stderr, "Unable to read instructions\n");
