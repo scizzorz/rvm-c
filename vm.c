@@ -31,14 +31,33 @@ R_vm *vm_new() {
   return this;
 }
 
+bool vm_import(R_vm *this, const char *fname) {
+  FILE *fp = fopen(fname, "rb");
+
+  if(fp == NULL) {
+    fprintf(stderr, "Unable to open file %s\n", fname);
+    return false;
+  }
+
+  uint32_t next_instr = this->num_instrs;
+  if(!vm_load(this, fp)) {
+    fprintf(stderr, "Unable to load bytecode\n");
+    fclose(fp);
+    return false;
+  }
+
+  vm_call(this, next_instr);
+  return true;
+}
+
 bool vm_load(R_vm *this, FILE *fp) {
-  int rv;
+  size_t rv;
   R_header header;
 
   // save previous counts
-  int prev_consts = this->num_consts;
-  int prev_instrs = this->num_instrs;
-  int prev_strings = this->num_strings;
+  uint32_t prev_consts = this->num_consts;
+  uint32_t prev_instrs = this->num_instrs;
+  uint32_t prev_strings = this->num_strings;
 
   // read header information
   rv = fread(&header, sizeof(R_header), 1, fp);
@@ -58,8 +77,8 @@ bool vm_load(R_vm *this, FILE *fp) {
   this->strings = GC_realloc(this->strings, sizeof(char *) * this->num_strings);
 
   // read all strings
-  int len = 0;
-  for(int i=prev_strings; i<this->num_strings; i++) {
+  uint32_t len = 0;
+  for(uint32_t i=prev_strings; i<this->num_strings; i++) {
     rv = fread(&len, sizeof(int), 1, fp);
     if(rv != 1) {
       fprintf(stderr, "Unable to read string %d length\n", i);
@@ -94,14 +113,14 @@ bool vm_load(R_vm *this, FILE *fp) {
   vm_new_scope(this);
 
   // adjust string const pointers
-  for(int i=prev_consts; i<this->num_consts; i++) {
+  for(uint32_t i=prev_consts; i<this->num_consts; i++) {
     if(R_TYPE_IS(&this->consts[i], STR)) {
       this->consts[i].str = this->strings[this->consts[i].i64 + prev_strings];
     }
   }
 
   // adjust instruction indices
-  for(int i=prev_instrs; i<this->num_instrs; i++) {
+  for(uint32_t i=prev_instrs; i<this->num_instrs; i++) {
     switch(R_OP(&this->instrs[i])) {
       case PUSH_CONST:
         this->instrs[i].u32 += prev_consts << 8;
@@ -146,20 +165,20 @@ bool vm_run(R_vm *this) {
 
 void vm_dump(R_vm *this) {
   printf("Constants (%d):\n", this->num_consts);
-  for(int i=0; i<this->num_consts; i++) {
+  for(uint32_t i=0; i<this->num_consts; i++) {
     printf("   ");
     R_box_print(this->consts + i);
   }
 
   printf("Instructions (%d):\n", this->num_instrs);
-  for(int i=0; i<this->num_instrs; i++) {
+  for(uint32_t i=0; i<this->num_instrs; i++) {
     printf("%02x", i);
     printf(i == this->instr_ptr ? " > " : "   ");
     R_op_print(this->instrs + i);
   }
 
   printf("Stack (%d / %d):\n", this->stack_ptr, this->stack_size);
-  for(int i=0; i<this->stack_size; i++) {
+  for(uint32_t i=0; i<this->stack_size; i++) {
     if(i + 1 > this->stack_ptr) {
       printf("     ");
     }
@@ -174,7 +193,7 @@ void vm_dump(R_vm *this) {
   }
 
   printf("Frames (%d / %d):\n", this->frame_ptr, this->frame_size);
-  for(int i=0; i<this->frame_ptr; i++) {
+  for(uint32_t i=0; i<this->frame_ptr; i++) {
     printf("%02x    ", this->frames[i].instr_ptr);
     if(this->frames[i].instr_ptr < this->num_instrs) {
       R_op_print(this->instrs + this->frames[i].instr_ptr);

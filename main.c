@@ -7,35 +7,21 @@ int main(int argv, char **argc) {
     return 1;
   }
 
-  FILE *fp = fopen(argc[1], "rb");
-
-  if(fp == NULL) {
-    fprintf(stderr, "Unable to open file %s\n", argc[1]);
-    return 1;
-  }
-
   R_vm *this = vm_new();
   if(this == NULL) {
     fprintf(stderr, "Unable to create VM\n");
     return 1;
   }
 
-  if(!vm_load(this, fp)) {
-    fprintf(stderr, "Unable to load bytecode\n");
-    return 1;
-  }
+  vm_import(this, argc[1]);
 
   vm_dump(this);
   printf("--------\n");
 
-  vm_call(this, 0);
-
   do {
-    vm_dump(this);
-    printf("--------\n");
+    //vm_dump(this);
+    //printf("--------\n");
   } while(vm_step(this));
-
-  vm_dump(this);
 
   return 0;
 }

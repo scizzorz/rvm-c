@@ -38,6 +38,7 @@ typedef struct R_vm {
 } R_vm;
 
 R_vm *vm_new();
+bool vm_import(R_vm *this, const char *fname);
 bool vm_load(R_vm *this, FILE *fp);
 bool vm_exec(R_vm *this, R_op *instr);
 bool vm_step(R_vm *this);
