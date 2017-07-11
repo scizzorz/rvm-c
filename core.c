@@ -120,8 +120,10 @@ void R_op_print(R_op *instr) {
       break;
     case JUMP:
     case JUMPIF:
-    case CALLTO:
       printf("%s (%d)\n", R_INSTR_NAMES[R_OP(instr)], R_SI(instr));
+      break;
+    case CALLTO:
+      printf("%s (%02x)\n", R_INSTR_NAMES[R_OP(instr)], R_UI(instr));
       break;
     default:
       printf("%s\n", R_INSTR_NAMES[R_OP(instr)]);
