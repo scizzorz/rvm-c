@@ -1,9 +1,9 @@
 # vim: set noet:
-LIBS=-lgc
+LIBS=-lgc -ldl
 FLAGS=
-EXECS=rain dis step
+EXECS=rain dis step builtins.so
 ARTIFACTS=*.o *.rnc
-OBJS=core.o vm.o instr.o table.o builtins.o
+OBJS=core.o vm.o instr.o table.o
 
 all: ${EXECS}
 
@@ -15,6 +15,9 @@ step: ${OBJS} step.o
 
 dis: ${OBJS} dis.o
 	clang ${FLAGS} -o $@ ${LIBS} $^
+
+builtins.so: builtins.c
+	clang ${FLAGS} -fPIC -shared -o $@ $^
 
 %.o: %.c
 	clang ${FLAGS} -o $@ -c $^

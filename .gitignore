@@ -2,4 +2,5 @@ rain
 dis
 step
 *.o
+*.so
 *.rnc
