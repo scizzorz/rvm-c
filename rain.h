@@ -4,3 +4,4 @@
 #include "instr.h"
 #include "table.h"
 #include "vm.h"
+#include "builtins.h"

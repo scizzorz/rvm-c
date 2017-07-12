@@ -3,7 +3,7 @@ LIBS=-lgc
 FLAGS=
 EXECS=rain dis step
 ARTIFACTS=*.o *.rnc
-OBJS=core.o vm.o instr.o table.o
+OBJS=core.o vm.o instr.o table.o builtins.o
 
 all: ${EXECS}
 

@@ -1,7 +1,7 @@
 #ifndef R_VM_H
 #define R_VM_H
 
-#include "rain.h"
+#include "core.h"
 #include <stdbool.h>
 
 typedef struct R_header {
