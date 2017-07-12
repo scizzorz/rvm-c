@@ -1,3 +1,4 @@
+from contextlib import contextmanager as ctx
 import ctypes as ct
 import struct
 
@@ -107,6 +108,11 @@ class Sx(Instr):
     return CInstr(self.op, a, b, c)
 
 
+class SBx(Sx):
+  def __init__(self, block):
+    self.block = block
+
+
 class Sxyz(Instr):
   def __init__(self, x, y, z):
     self.x = x
@@ -127,6 +133,11 @@ class Ux(Instr):
     return CInstr(self.op, a, b, c)
 
 
+class UBx(Ux):
+  def __init__(self, block):
+    self.block = block
+
+
 class Uxyz(Instr):
   def __init__(self, x, y, z):
     self.x = x
@@ -140,8 +151,8 @@ class Uxyz(Instr):
 
 class PushConst(Ux): op = Instr.PUSH_CONST
 class Print(Nx): op = Instr.PRINT
-class Jump(Sx): op = Instr.JUMP
-class JumpIf(Sx): op = Instr.JUMPIF
+class Jump(SBx): op = Instr.JUMP
+class JumpIf(SBx): op = Instr.JUMPIF
 class Dup(Nx): op = Instr.DUP
 class Pop(Nx): op = Instr.POP
 class Set(Nx): op = Instr.SET
@@ -149,7 +160,7 @@ class Get(Nx): op = Instr.GET
 class PushTable(Nx): op = Instr.PUSH_TABLE
 class PushScope(Ux): op = Instr.PUSH_SCOPE
 class NewScope(Nx): op = Instr.NEW_SCOPE
-class CallTo(Ux): op = Instr.CALLTO
+class CallTo(UBx): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
 class Import(Nx): op = Instr.IMPORT
 
@@ -181,80 +192,128 @@ class Cmp(Ux):
   CMP_NE     = 0x05
 
 
-class Module:
-  def __init__(self, name, consts=None, instrs=None):
-    if consts is None:
-      consts = []
+class Block:
+  def __init__(self):
+    self.addr = None
+    self.instrs = []
 
-    if instrs is None:
-      instrs = []
+  def __len__(self):
+    return len(self.instrs)
 
-    self.name = name
-    self.consts = consts
-    self.instrs = instrs
-
-  def add_const(self, val):
-    self.consts.append(Box.to_rain(val))
-    return len(self.consts) - 1
+  def write(self, fp):
+    for instr in self.instrs:
+      fp.write(instr.as_c())
 
   def add_instr(self, *instrs):
     self.instrs.extend(instrs)
 
+  def set_addr(self, addr):
+    self.addr = addr
+
+  def finalize(self):
+    self.instrs = tuple(self.instrs)
+
+    for i, instr in enumerate(self.instrs):
+      if isinstance(instr, CallTo):
+        instr.x = instr.block.addr
+
+      elif isinstance(instr, (Jump, JumpIf)):
+        instr.x = instr.block.addr - (self.addr + i) - 1
+
+
+class Module:
+  def __init__(self, name):
+    self.name = name
+    self.consts = []
+    self.block = None
+    self.root = Block()
+    self.blocks = [self.root]
+    self.frozen = False
+    self.instr_count = 0
+
+  def finalize(self):
+    # hacky, but works for now
+    self.blocks = tuple(self.blocks)
+    self.consts = tuple(self.consts)
+    self.frozen = True
+
+    for block in self.blocks:
+      block.set_addr(self.instr_count)
+      self.instr_count += len(block)
+
+    for block in self.blocks:
+      block.finalize()
+
+  def add_const(self, val):
+    if self.frozen:
+      raise Exception('Module {!r} already finalized'.format(self.name))
+
+    self.consts.append(Box.to_rain(val))
+    return len(self.consts) - 1
+
+  def add_instr(self, *instrs):
+    if self.frozen:
+      raise Exception('Module {!r} already finalized'.format(self.name))
+
+    self.block.add_instr(*instrs)
+
   def push_const(self, idx):
-    self.instrs.append(PushConst(idx))
+    self.add_instr(PushConst(idx))
 
   def push_scope(self, idx=0):
-    self.instrs.append(PushScope(idx))
+    self.add_instr(PushScope(idx))
 
   def push_table(self):
-    self.instrs.append(PushTable())
+    self.add_instr(PushTable())
 
   def pop(self):
-    self.instrs.append(Pop())
+    self.add_instr(Pop())
 
   def dup(self):
-    self.instrs.append(Dup())
+    self.add_instr(Dup())
 
   def print(self):
-    self.instrs.append(Print())
+    self.add_instr(Print())
 
   def set(self):
-    self.instrs.append(Set())
+    self.add_instr(Set())
 
   def get(self):
-    self.instrs.append(Get())
+    self.add_instr(Get())
 
   def jump(self, offset):
-    self.instrs.append(Jump(offset))
+    self.add_instr(Jump(offset))
 
   def jump_if(self, offset):
-    self.instrs.append(JumpIf(offset))
+    self.add_instr(JumpIf(offset))
 
   def call_to(self, instr):
-    self.instrs.append(CallTo(instr))
+    self.add_instr(CallTo(instr))
 
   def ret(self):
-    self.instrs.append(Return())
+    self.add_instr(Return())
 
   def imp(self):
-    self.instrs.append(Import())
+    self.add_instr(Import())
 
   def add(self):
-    self.instrs.append(BinOp(BinOp.BIN_ADD))
+    self.add_instr(BinOp(BinOp.BIN_ADD))
 
   def sub(self):
-    self.instrs.append(BinOp(BinOp.BIN_SUB))
+    self.add_instr(BinOp(BinOp.BIN_SUB))
 
   def mul(self):
-    self.instrs.append(BinOp(BinOp.BIN_MUL))
+    self.add_instr(BinOp(BinOp.BIN_MUL))
 
   def div(self):
-    self.instrs.append(BinOp(BinOp.BIN_DIV))
+    self.add_instr(BinOp(BinOp.BIN_DIV))
 
   def write(self):
+    self.finalize()
+
     with open('{0.name}.rnc'.format(self), 'wb') as fp:
       fp.write(struct.pack('<I', len(self.consts)))
-      fp.write(struct.pack('<I', len(self.instrs)))
+      fp.write(struct.pack('<I', self.instr_count))
       fp.write(struct.pack('<I', len(Box._strings_)))
 
       for string in Box._strings_:
@@ -264,37 +323,53 @@ class Module:
       for const in self.consts:
         fp.write(const)
 
-      for instr in self.instrs:
-        fp.write(instr.as_c())
+      for block in self.blocks:
+        block.write(fp)
+
+  def add_block(self):
+    block = Block()
+    self.blocks.append(block)
+    return block
+
+  @ctx
+  def goto(self, block):
+    temp = self.block
+    self.block = block
+    yield
+    self.block = temp
+
 
 main = Module('main')
 
-x = main.add_const('x')
-y = main.add_const('y')
-z = main.add_const('z')
-i3 = main.add_const(3)
-i4 = main.add_const(4)
+fn_test = main.add_block()
 
-main.call_to(2)
-main.ret()
+with main.goto(main.root):
+  main.call_to(fn_test)
+  main.ret()
 
-main.push_const(i3)
-main.push_const(i4)
-main.add()
-main.print()
-main.ret()
+with main.goto(fn_test):
+  i3 = main.add_const(3)
+  i4 = main.add_const(4)
+
+  main.push_const(i3)
+  main.push_const(i4)
+  main.add()
+  main.print()
+  main.ret()
 
 main.write()
 
+
 test = Module('test')
 
-hello = test.add_const('Hello, world!')
-main_f = test.add_const('main.rnc')
+with test.goto(test.root):
+  hello = test.add_const('Hello, world!')
+  main_f = test.add_const('main.rnc')
 
-test.push_const(hello)
-test.print()
-test.push_const(main_f)
-test.imp()
-test.ret()
+  test.push_const(hello)
+  test.print()
+  test.push_const(main_f)
+  test.imp()
+  test.ret()
 
 test.write()
