@@ -34,7 +34,6 @@ typedef struct R_vm {
   R_box *consts;
   R_op *instrs;
   R_box *stack;
-  R_box *scopes;
   R_frame *frames;
 } R_vm;
 
@@ -50,7 +49,6 @@ R_box vm_top(R_vm *this);
 R_box *vm_push(R_vm *this, R_box *val);
 R_box *vm_alloc(R_vm *this);
 void vm_set(R_vm *this, R_box *val);
-void vm_new_scope(R_vm *this);
 void vm_call(R_vm *this, uint32_t to, R_box *scope);
 void vm_ret(R_vm *this);
 

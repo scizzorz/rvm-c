@@ -208,7 +208,6 @@ void R_PUSH_TABLE(R_vm *vm, R_op *instr) {
 }
 
 void R_NEW_SCOPE(R_vm *vm, R_op *instr) {
-  vm_new_scope(vm);
 }
 
 void R_CALLTO(R_vm *vm, R_op *instr) {

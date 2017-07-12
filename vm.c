@@ -25,7 +25,6 @@ R_vm *vm_new() {
   this->strings = GC_malloc(sizeof(char *));
 
   this->stack = GC_malloc(sizeof(R_box) * this->stack_size);
-  this->scopes = GC_malloc(sizeof(R_box) * this->scope_size);
   this->frames = GC_malloc(sizeof(R_frame) * this->frame_size);
 
   return this;
@@ -212,16 +211,6 @@ R_box vm_top(R_vm *this) {
 
 void vm_set(R_vm *this, R_box *val) {
   this->stack[this->stack_ptr - 1] = *val;
-}
-
-void vm_new_scope(R_vm *this) {
-  if(this->scope_ptr >= this->scope_size) {
-    this->scope_size *= 2;
-    this->scopes = GC_realloc(this->scopes, sizeof(R_box) * this->scope_size);
-  }
-
-  R_set_table(&this->scopes[this->scope_ptr]);
-  this->scope_ptr += 1;
 }
 
 R_box *vm_alloc(R_vm *this) {
