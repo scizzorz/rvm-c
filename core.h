@@ -61,6 +61,7 @@ typedef struct R_table {
 void R_box_print(R_box *val);
 void R_op_print(R_op *instr);
 
+bool R_has_meta(R_box *val);
 void R_set_box(R_box *ret, R_box *from);
 void R_set_null(R_box *ret);
 void R_set_int(R_box *ret, signed long si);

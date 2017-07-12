@@ -34,6 +34,10 @@ void R_box_print(R_box *val) {
   }
 }
 
+bool R_has_meta(R_box *val) {
+  return (val->meta != NULL) && (R_TYPE_ISNT(val->meta, NULL));
+}
+
 void R_set_box(R_box *ret, R_box *from) {
   ret->type = from->type;
   ret->u64 = from->u64;
