@@ -52,7 +52,7 @@ void R_PUSH_CONST(R_vm *vm, R_op *instr) {
 }
 
 void R_PUSH_SCOPE(R_vm *vm, R_op *instr) {
-  vm_push(vm, &vm->scopes[R_UI(instr)]);
+  vm_push(vm, &vm->frames[vm->frame_ptr - 1].scope);
 }
 
 void R_UN_OP(R_vm *vm, R_op *instr) {
@@ -212,7 +212,7 @@ void R_NEW_SCOPE(R_vm *vm, R_op *instr) {
 }
 
 void R_CALLTO(R_vm *vm, R_op *instr) {
-  vm_call(vm, R_UI(instr) - 1);
+  vm_call(vm, R_UI(instr) - 1, NULL);
 }
 
 void R_RETURN(R_vm *vm, R_op *instr) {

@@ -46,7 +46,7 @@ bool vm_import(R_vm *this, const char *fname) {
     return false;
   }
 
-  vm_call(this, next_instr);
+  vm_call(this, next_instr, NULL);
   return true;
 }
 
@@ -109,9 +109,6 @@ bool vm_load(R_vm *this, FILE *fp) {
     return false;
   }
 
-  // create a new global scope
-  vm_new_scope(this);
-
   // adjust string const pointers
   for(uint32_t i=prev_consts; i<this->num_consts; i++) {
     if(R_TYPE_IS(&this->consts[i], STR)) {
@@ -124,9 +121,6 @@ bool vm_load(R_vm *this, FILE *fp) {
     switch(R_OP(&this->instrs[i])) {
       case PUSH_CONST:
         this->instrs[i].u32 += prev_consts << 8;
-        break;
-      case PUSH_SCOPE:
-        this->instrs[i].u32 += (this->scope_ptr - 1) << 8;
         break;
       case CALLTO:
         this->instrs[i].u32 += prev_instrs << 8;
@@ -254,8 +248,16 @@ R_box *vm_push(R_vm *this, R_box *val) {
   return &this->stack[this->stack_ptr - 1];
 }
 
-void vm_call(R_vm *this, uint32_t to) {
+void vm_call(R_vm *this, uint32_t to, R_box *scope) {
   this->frames[this->frame_ptr].instr_ptr = this->instr_ptr;
+
+  if(scope == NULL) {
+    R_set_table(&this->frames[this->frame_ptr].scope);
+  }
+  else {
+    this->frames[this->frame_ptr].scope = *scope;
+  }
+
   this->frame_ptr += 1;
   this->instr_ptr = to;
 }

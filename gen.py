@@ -158,7 +158,7 @@ class Pop(Nx): op = Instr.POP
 class Set(Nx): op = Instr.SET
 class Get(Nx): op = Instr.GET
 class PushTable(Nx): op = Instr.PUSH_TABLE
-class PushScope(Ux): op = Instr.PUSH_SCOPE
+class PushScope(Nx): op = Instr.PUSH_SCOPE
 class NewScope(Nx): op = Instr.NEW_SCOPE
 class CallTo(UBx): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
@@ -260,8 +260,8 @@ class Module:
   def push_const(self, idx):
     self.add_instr(PushConst(idx))
 
-  def push_scope(self, idx=0):
-    self.add_instr(PushScope(idx))
+  def push_scope(self):
+    self.add_instr(PushScope())
 
   def push_table(self):
     self.add_instr(PushTable())
