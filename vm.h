@@ -11,7 +11,7 @@ typedef struct R_header {
 } R_header;
 
 typedef struct R_frame {
-  uint32_t instr_ptr;
+  uint32_t return_to;
   R_box scope;
 } R_frame;
 

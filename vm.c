@@ -193,9 +193,9 @@ void vm_dump(R_vm *this) {
 
   printf("Frames (%d / %d):\n", this->frame_ptr, this->frame_size);
   for(uint32_t i=0; i<this->frame_ptr; i++) {
-    printf("%02x    ", this->frames[i].instr_ptr);
-    if(this->frames[i].instr_ptr < this->num_instrs) {
-      R_op_print(this->instrs + this->frames[i].instr_ptr);
+    printf("%02x    ", this->frames[i].return_to);
+    if(this->frames[i].return_to < this->num_instrs) {
+      R_op_print(this->instrs + this->frames[i].return_to);
     }
     else {
       printf("???\n");
@@ -241,7 +241,7 @@ R_box *vm_push(R_vm *this, R_box *val) {
 }
 
 void vm_call(R_vm *this, uint32_t to, R_box *scope) {
-  this->frames[this->frame_ptr].instr_ptr = this->instr_ptr;
+  this->frames[this->frame_ptr].return_to = this->instr_ptr;
 
   if(scope == NULL) {
     R_set_table(&this->frames[this->frame_ptr].scope);
@@ -256,5 +256,5 @@ void vm_call(R_vm *this, uint32_t to, R_box *scope) {
 
 void vm_ret(R_vm *this) {
   this->frame_ptr -= 1;
-  this->instr_ptr = this->frames[this->frame_ptr].instr_ptr;
+  this->instr_ptr = this->frames[this->frame_ptr].return_to;
 }
