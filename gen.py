@@ -226,8 +226,8 @@ class Module:
     self.name = name
     self.consts = []
     self.block = None
-    self.root = Block()
-    self.blocks = [self.root]
+    self.main = Block()
+    self.blocks = [self.main]
     self.frozen = False
     self.instr_count = 0
 
@@ -343,7 +343,7 @@ main = Module('main')
 
 fn_test = main.add_block()
 
-with main.goto(main.root):
+with main.goto(main.main):
   main.call_to(fn_test)
   main.ret()
 
@@ -359,10 +359,92 @@ with main.goto(fn_test):
 
 main.write()
 
+iftest = Module('if')
+
+false_br = iftest.add_block()
+true_br = iftest.add_block()
+next_br = iftest.add_block()
+
+with iftest.goto(iftest.main):
+  const = iftest.add_const(False)
+  iftest.push_const(const)
+  iftest.jump_if(true_br)
+  iftest.jump(false_br)
+
+with iftest.goto(false_br):
+  text = iftest.add_const('False!')
+  iftest.push_const(text)
+  iftest.print()
+  iftest.jump(next_br)
+
+with iftest.goto(true_br):
+  text = iftest.add_const('True!')
+  iftest.push_const(text)
+  iftest.print()
+  iftest.jump(next_br)
+
+with iftest.goto(next_br):
+  text = iftest.add_const('Done!')
+  iftest.push_const(text)
+  iftest.print()
+
+iftest.write()
+
+
+looptest = Module('loop')
+
+neg = looptest.add_const(-1)
+end = looptest.add_const(0)
+start = looptest.add_const(10)
+name = looptest.add_const('x')
+
+loop_body = looptest.add_block()
+loop_before = looptest.add_block()
+loop_after = looptest.add_block()
+
+with looptest.goto(looptest.main):
+  looptest.push_const(start)
+  looptest.push_const(name)
+  looptest.push_scope()
+  looptest.set()
+
+  looptest.jump(loop_before)
+
+with looptest.goto(loop_before):
+  looptest.push_const(end)
+  looptest.push_const(name)
+  looptest.push_scope()
+  looptest.get()
+
+  looptest.add_instr(Cmp(Cmp.CMP_GT))
+  looptest.jump_if(loop_body)
+  looptest.jump(loop_after)
+
+with looptest.goto(loop_body):
+  looptest.push_const(name)
+  looptest.push_scope()
+  looptest.get()
+  looptest.push_const(neg)
+  looptest.add()
+  looptest.dup()
+  looptest.print()
+  looptest.push_const(name)
+  looptest.push_scope()
+  looptest.set()
+
+  looptest.jump(loop_before)
+
+with looptest.goto(loop_after):
+  done = looptest.add_const('Done!')
+  looptest.push_const(done)
+  looptest.print()
+
+looptest.write()
+
 
 test = Module('test')
 
-with test.goto(test.root):
+with test.goto(test.main):
   hello = test.add_const('Hello, world!')
   main_f = test.add_const('main.rnc')
 
