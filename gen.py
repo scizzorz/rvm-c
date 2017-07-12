@@ -59,7 +59,7 @@ Box._fields_ = [('type', ct.c_uint8),
 Box.nullptr = ct.POINTER(Box)()
 
 
-class Op(ct.Structure):
+class CInstr(ct.Structure):
   _fields_ = [('a', ct.c_uint8),
               ('b', ct.c_uint8),
               ('c', ct.c_uint8),
@@ -87,26 +87,11 @@ class Instr:
   RETURN     = 0x0F
   IMPORT     = 0x10
 
-  CMP_LT     = 0x00
-  CMP_LE     = 0x01
-  CMP_GT     = 0x02
-  CMP_GE     = 0x03
-  CMP_EQ     = 0x04
-  CMP_NE     = 0x05
-
-  BIN_ADD    = 0x00
-  BIN_SUB    = 0x01
-  BIN_MUL    = 0x02
-  BIN_DIV    = 0x03
-
-  UN_NEG     = 0x00
-  UN_NOT     = 0x01
-
   def __init__(self):
     pass
 
   def as_c(self):
-    return Op(self.op, 0, 0, 0)
+    return CInstr(self.op, 0, 0, 0)
 
 
 class Nx(Instr):
@@ -119,7 +104,7 @@ class Sx(Instr):
 
   def as_c(self):
     a, b, c, *_ = struct.pack('<i', self.x)
-    return Op(self.op, a, b, c)
+    return CInstr(self.op, a, b, c)
 
 
 class Sxyz(Instr):
@@ -130,7 +115,7 @@ class Sxyz(Instr):
 
   def as_c(self):
     a, b, c = map(lambda x: struct.pack('<b', x), (self.x, self.y, self.z))
-    return Op(self.op, a, b, c)
+    return CInstr(self.op, a, b, c)
 
 
 class Ux(Instr):
@@ -139,7 +124,7 @@ class Ux(Instr):
 
   def as_c(self):
     a, b, c, *_ = struct.pack('<I', self.x)
-    return Op(self.op, a, b, c)
+    return CInstr(self.op, a, b, c)
 
 
 class Uxyz(Instr):
@@ -150,14 +135,11 @@ class Uxyz(Instr):
 
   def as_c(self):
     a, b, c = map(lambda x: struct.pack('<B', x), (self.x, self.y, self.z))
-    return Op(self.op, a, b, c)
+    return CInstr(self.op, a, b, c)
 
 
 class PushConst(Ux): op = Instr.PUSH_CONST
 class Print(Nx): op = Instr.PRINT
-class BinOp(Ux): op = Instr.BIN_OP
-class UnOp(Ux): op = Instr.UN_OP
-class Cmp(Ux): op = Instr.CMP
 class Jump(Sx): op = Instr.JUMP
 class JumpIf(Sx): op = Instr.JUMPIF
 class Dup(Nx): op = Instr.DUP
@@ -170,6 +152,34 @@ class NewScope(Nx): op = Instr.NEW_SCOPE
 class CallTo(Ux): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
 class Import(Nx): op = Instr.IMPORT
+
+
+class BinOp(Ux):
+  op = Instr.BIN_OP
+
+  BIN_ADD    = 0x00
+  BIN_SUB    = 0x01
+  BIN_MUL    = 0x02
+  BIN_DIV    = 0x03
+
+
+class UnOp(Ux):
+  op = Instr.UN_OP
+
+  UN_NEG     = 0x00
+  UN_NOT     = 0x01
+
+
+class Cmp(Ux):
+  op = Instr.CMP
+
+  CMP_LT     = 0x00
+  CMP_LE     = 0x01
+  CMP_GT     = 0x02
+  CMP_GE     = 0x03
+  CMP_EQ     = 0x04
+  CMP_NE     = 0x05
+
 
 class Module:
   def __init__(self, name, consts=None, instrs=None):
@@ -230,16 +240,16 @@ class Module:
     self.instrs.append(Import())
 
   def add(self):
-    self.instrs.append(BinOp(Instr.BIN_ADD))
+    self.instrs.append(BinOp(BinOp.BIN_ADD))
 
   def sub(self):
-    self.instrs.append(BinOp(Instr.BIN_SUB))
+    self.instrs.append(BinOp(BinOp.BIN_SUB))
 
   def mul(self):
-    self.instrs.append(BinOp(Instr.BIN_MUL))
+    self.instrs.append(BinOp(BinOp.BIN_MUL))
 
   def div(self):
-    self.instrs.append(BinOp(Instr.BIN_DIV))
+    self.instrs.append(BinOp(BinOp.BIN_DIV))
 
   def write(self):
     with open('{0.name}.rnc'.format(self), 'wb') as fp:
