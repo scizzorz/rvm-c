@@ -66,7 +66,7 @@ class Op(ct.Structure):
               ('op', ct.c_uint8)]
 
 
-class Instr(Op):
+class Instr:
   op = 0xFF
 
   PUSH_CONST = 0x00
@@ -102,37 +102,55 @@ class Instr(Op):
   UN_NEG     = 0x00
   UN_NOT     = 0x01
 
-  def __init__(self, a, b, c):
-    super().__init__(self.op, a, b, c)
+  def __init__(self):
+    pass
+
+  def as_c(self):
+    return Op(self.op, 0, 0, 0)
 
 
 class Nx(Instr):
-  def __init__(self):
-    super().__init__(0, 0, 0)
+  pass
 
 
 class Sx(Instr):
   def __init__(self, x):
-    a, b, c, *_ = struct.pack('<i', x)
-    super().__init__(a, b, c)
+    self.x = x
+
+  def as_c(self):
+    a, b, c, *_ = struct.pack('<i', self.x)
+    return Op(self.op, a, b, c)
 
 
 class Sxyz(Instr):
   def __init__(self, x, y, z):
-    a, b, c = map(lambda x: struct.pack('<b', x), (x, y, z))
-    super().__init__(a, b, c)
+    self.x = x
+    self.y = y
+    self.z = z
+
+  def as_c(self):
+    a, b, c = map(lambda x: struct.pack('<b', x), (self.x, self.y, self.z))
+    return Op(self.op, a, b, c)
 
 
 class Ux(Instr):
   def __init__(self, x):
-    a, b, c, *_ = struct.pack('<I', x)
-    super().__init__(a, b, c)
+    self.x = x
+
+  def as_c(self):
+    a, b, c, *_ = struct.pack('<I', self.x)
+    return Op(self.op, a, b, c)
 
 
 class Uxyz(Instr):
   def __init__(self, x, y, z):
-    a, b, c = map(lambda x: struct.pack('<B', x), (x, y, z))
-    super().__init__(a, b, c)
+    self.x = x
+    self.y = y
+    self.z = z
+
+  def as_c(self):
+    a, b, c = map(lambda x: struct.pack('<B', x), (self.x, self.y, self.z))
+    return Op(self.op, a, b, c)
 
 
 class PushConst(Ux): op = Instr.PUSH_CONST
@@ -237,7 +255,7 @@ class Module:
         fp.write(const)
 
       for instr in self.instrs:
-        fp.write(instr)
+        fp.write(instr.as_c())
 
 main = Module('main')
 
