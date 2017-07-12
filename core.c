@@ -49,30 +49,35 @@ void R_set_null(R_box *ret) {
   ret->type = R_TYPE_NULL;
   ret->u64 = 0;
   ret->size = 0;
+  ret->meta = NULL;
 }
 
 void R_set_int(R_box *ret, signed long si) {
   ret->type = R_TYPE_INT;
   ret->i64 = si;
   ret->size = 0;
+  ret->meta = NULL;
 }
 
 void R_set_float(R_box *ret, double f) {
   ret->type = R_TYPE_FLOAT;
   ret->f64 = f;
   ret->size = 0;
+  ret->meta = NULL;
 }
 
 void R_set_bool(R_box *ret, bool v) {
   ret->type = R_TYPE_BOOL;
   ret->u64 = v;
   ret->size = 0;
+  ret->meta = NULL;
 }
 
 void R_set_str(R_box *ret, char *s) {
   ret->type = R_TYPE_STR;
   ret->str = s;
   ret->size = strlen(s);
+  ret->meta = NULL;
 }
 
 void R_set_strcpy(R_box *ret, const char *s) {
@@ -84,6 +89,7 @@ void R_set_strcpy(R_box *ret, const char *s) {
 
   memcpy(ret->str, s, size);
   ret->str[size] = 0;
+  ret->meta = NULL;
 }
 
 void R_set_table_sized(R_box *ret, uint32_t size) {
@@ -95,6 +101,7 @@ void R_set_table_sized(R_box *ret, uint32_t size) {
   ret->type = R_TYPE_TABLE;
   ret->table = table;
   ret->size = 0;
+  ret->meta = NULL;
 }
 
 void R_set_table(R_box *ret) {
@@ -104,13 +111,15 @@ void R_set_table(R_box *ret) {
 void R_set_func(R_box *ret, void *p, int num_args) {
   ret->type = R_TYPE_FUNC;
   ret->ptr = p;
-  ret->size = num_args;
+  ret->size = 0;
+  ret->meta = NULL;
 }
 
 void R_set_cdata(R_box *ret, void *p) {
   ret->type = R_TYPE_CDATA;
   ret->ptr = p;
   ret->size = 0;
+  ret->meta = NULL;
 }
 
 void R_set_meta(R_box *val, R_box *meta) {
