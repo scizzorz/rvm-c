@@ -30,6 +30,20 @@ bool R_hash_eq(R_box *lhs, R_box *rhs) {
   return lhs->u64 == rhs->u64;
 }
 
+void R_table_clone(R_box *from, R_box *to) {
+  uint32_t max = from->table->max;
+  R_item **items = from->table->items;
+
+  R_set_table_sized(to, max);
+  to->meta = from->meta;
+
+  for(int i=0; i<max; i++) {
+    if(items[i] != NULL) {
+      R_table_set_aux(to, &items[i]->key, &items[i]->val, items[i]);
+    }
+  }
+}
+
 R_item *R_table_get_item(R_box *table, R_box *key) {
   uint32_t cur = table->table->cur;
   uint32_t max = table->table->max;
