@@ -112,7 +112,6 @@ void R_set_meta(R_box *val, R_box *meta) {
 void R_op_print(R_op *instr) {
   switch(R_OP(instr)) {
     case PUSH_CONST:
-    case PUSH_SCOPE:
     case BIN_OP:
     case UN_OP:
     case CMP:

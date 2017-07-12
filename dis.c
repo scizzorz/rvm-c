@@ -18,6 +18,22 @@ int main(int argv, char **argc) {
     return 1;
   }
 
-  vm_dump(this);
+  printf("Strings (%d):\n", this->num_strings);
+  for(uint32_t i=0; i<this->num_strings; i++) {
+    printf("  % 2d %s\n", i, this->strings[i]);
+  }
+
+  printf("Constants (%d):\n", this->num_consts);
+  for(uint32_t i=0; i<this->num_consts; i++) {
+    printf("  % 2d ", i);
+    R_box_print(this->consts + i);
+  }
+
+  printf("Instructions (%d):\n", this->num_instrs);
+  for(uint32_t i=0; i<this->num_instrs; i++) {
+    printf("  %02x ", i);
+    R_op_print(this->instrs + i);
+  }
+
   return 0;
 }
