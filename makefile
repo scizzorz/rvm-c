@@ -1,13 +1,21 @@
 # vim: set noet:
 LIBS=-lgc
 FLAGS=
+EXECS=rain dis
+ARTIFACTS=*.o
 
-all: rain
+all: ${EXECS}
 
 rain: main.o core.o vm.o instr.o table.o
 	clang ${FLAGS} -o $@ ${LIBS} $^
 
+dis: dis.o core.o vm.o instr.o table.o
+	clang ${FLAGS} -o $@ ${LIBS} $^
+
 main.o: main.c
+	clang ${FLAGS} -o $@ -c $^
+
+dis.o: dis.c
 	clang ${FLAGS} -o $@ -c $^
 
 instr.o: instr.c
@@ -23,4 +31,4 @@ vm.o: vm.c
 	clang ${FLAGS} -o $@ -c $^
 
 clean:
-	rm -rf rain *.o
+	rm -rf ${EXECS} ${ARTIFACTS}
