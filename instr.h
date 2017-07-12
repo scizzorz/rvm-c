@@ -18,7 +18,7 @@
 #define GET        0x0A
 #define PUSH_TABLE 0x0B
 #define PUSH_SCOPE 0x0C
-#define NEW_SCOPE  0x0D
+#define NOP        0x0D
 #define CALLTO     0x0E
 #define RETURN     0x0F
 #define IMPORT     0x10
@@ -51,7 +51,7 @@ void R_SET(R_vm *vm, R_op *instr);
 void R_GET(R_vm *vm, R_op *instr);
 void R_PUSH_TABLE(R_vm *vm, R_op *instr);
 void R_PUSH_SCOPE(R_vm *vm, R_op *instr);
-void R_NEW_SCOPE(R_vm *vm, R_op *instr);
+void R_NOP(R_vm *vm, R_op *instr);
 void R_CALLTO(R_vm *vm, R_op *instr);
 void R_RETURN(R_vm *vm, R_op *instr);
 void R_IMPORT(R_vm *vm, R_op *instr);

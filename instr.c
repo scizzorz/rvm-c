@@ -14,7 +14,7 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_GET,
   R_PUSH_TABLE,
   R_PUSH_SCOPE,
-  R_NEW_SCOPE,
+  R_NOP,
   R_CALLTO,
   R_RETURN,
   R_IMPORT,
@@ -35,7 +35,7 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "GET",
   "PUSH_TABLE",
   "PUSH_SCOPE",
-  "NEW_SCOPE",
+  "NOP",
   "CALLTO",
   "RETURN",
   "IMPORT",
@@ -207,7 +207,7 @@ void R_PUSH_TABLE(R_vm *vm, R_op *instr) {
   vm->stack_ptr += 1;
 }
 
-void R_NEW_SCOPE(R_vm *vm, R_op *instr) {
+void R_NOP(R_vm *vm, R_op *instr) {
 }
 
 void R_CALLTO(R_vm *vm, R_op *instr) {

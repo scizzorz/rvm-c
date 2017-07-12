@@ -83,7 +83,7 @@ class Instr:
   GET        = 0x0A
   PUSH_TABLE = 0x0B
   PUSH_SCOPE = 0x0C
-  NEW_SCOPE  = 0x0D
+  NOP        = 0x0D
   CALLTO     = 0x0E
   RETURN     = 0x0F
   IMPORT     = 0x10
@@ -159,7 +159,7 @@ class Set(Nx): op = Instr.SET
 class Get(Nx): op = Instr.GET
 class PushTable(Nx): op = Instr.PUSH_TABLE
 class PushScope(Nx): op = Instr.PUSH_SCOPE
-class NewScope(Nx): op = Instr.NEW_SCOPE
+class NOP(Nx): op = Instr.NOP
 class CallTo(UBx): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
 class Import(Nx): op = Instr.IMPORT
