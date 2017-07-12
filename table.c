@@ -30,7 +30,7 @@ bool R_hash_eq(R_box *lhs, R_box *rhs) {
   return lhs->u64 == rhs->u64;
 }
 
-R_box *R_table_get(R_box *table, R_box *key) {
+R_item *R_table_get_item(R_box *table, R_box *key) {
   uint32_t cur = table->table->cur;
   uint32_t max = table->table->max;
   R_item **items = table->table->items;
@@ -49,7 +49,17 @@ R_box *R_table_get(R_box *table, R_box *key) {
     idx = (idx + 1) % max;
   }
 
-  return &items[idx]->val;
+  return items[idx];
+}
+
+R_box *R_table_get(R_box *table, R_box *key) {
+  R_item *item = R_table_get_item(table, key);
+
+  if(item == NULL) {
+    return NULL;
+  }
+
+  return &item->val;
 }
 
 void R_table_set(R_box *table, R_box *key, R_box *val) {
