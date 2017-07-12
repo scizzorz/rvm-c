@@ -24,7 +24,7 @@ void R_box_print(R_box *val) {
       printf("table 0x%08lx\n", (unsigned long)val->ptr);
       break;
     case R_TYPE_FUNC:
-      printf("func 0x%08lx\n", (unsigned long)val->ptr);
+      printf("func 0x%04lx\n", val->u64);
       break;
     case R_TYPE_CDATA:
       printf("cdata 0x%08lx\n", (unsigned long)val->ptr);

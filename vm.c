@@ -113,6 +113,9 @@ bool vm_load(R_vm *this, FILE *fp) {
     if(R_TYPE_IS(&this->consts[i], STR)) {
       this->consts[i].str = this->strings[this->consts[i].i64 + prev_strings];
     }
+    else if(R_TYPE_IS(&this->consts[i], FUNC)) {
+      this->consts[i].u64 += prev_instrs;
+    }
   }
 
   // adjust instruction indices
