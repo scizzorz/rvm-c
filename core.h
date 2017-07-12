@@ -14,7 +14,8 @@
 #define R_TYPE_STR   4
 #define R_TYPE_TABLE 5
 #define R_TYPE_FUNC  6
-#define R_TYPE_CDATA 7
+#define R_TYPE_CFUNC 7
+#define R_TYPE_CDATA 8
 
 #define R_TYPE_IS(x, t) ((x)->type == R_TYPE_##t)
 #define R_TYPE_ISNT(x, t) ((x)->type != R_TYPE_##t)
@@ -71,7 +72,7 @@ void R_set_str(R_box *ret, char* s);
 void R_set_strcpy(R_box *ret, const char *s);
 void R_set_table(R_box *ret);
 void R_set_table_sized(R_box *ret, uint32_t size);
-void R_set_func(R_box *ret, void *p, int num_args);
+void R_set_cfunc(R_box *ret, void *p);
 void R_set_cdata(R_box *ret, void *p);
 void R_set_meta(R_box *val, R_box *meta);
 

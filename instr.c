@@ -234,9 +234,9 @@ void R_IMPORT(R_vm *vm, R_op *instr) {
 
 void R_CALL(R_vm *vm, R_op *instr) {
   R_box pop = vm_pop(vm);
-  if(R_TYPE_IS(&pop, FUNC)) {
-    R_box scope;
+  R_box scope;
 
+  if(R_TYPE_IS(&pop, FUNC)) {
     if(R_has_meta(&pop)) {
       R_table_clone(pop.meta, &scope);
     }
@@ -245,6 +245,22 @@ void R_CALL(R_vm *vm, R_op *instr) {
     }
 
     vm_call(vm, pop.u64 - 1, &scope);
+  }
+
+  else if(R_TYPE_IS(&pop, CFUNC)) {
+    if(R_has_meta(&pop)) {
+      R_table_clone(pop.meta, &scope);
+    }
+    else {
+      R_set_table(&scope);
+    }
+
+    vm_call(vm, vm->instr_ptr, &scope);
+
+    void (*fn)(R_vm *) = (void (*)(R_vm *))pop.ptr;
+    fn(vm);
+
+    vm_ret(vm);
   }
 }
 

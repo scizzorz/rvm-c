@@ -26,6 +26,9 @@ void R_box_print(R_box *val) {
     case R_TYPE_FUNC:
       printf("func 0x%04lx\n", val->u64);
       break;
+    case R_TYPE_CFUNC:
+      printf("cfunc 0x%08lx\n", (unsigned long)val->ptr);
+      break;
     case R_TYPE_CDATA:
       printf("cdata 0x%08lx\n", (unsigned long)val->ptr);
       break;
@@ -108,8 +111,8 @@ void R_set_table(R_box *ret) {
   R_set_table_sized(ret, R_INIT_TABLE_SIZE);
 }
 
-void R_set_func(R_box *ret, void *p, int num_args) {
-  ret->type = R_TYPE_FUNC;
+void R_set_cfunc(R_box *ret, void *p) {
+  ret->type = R_TYPE_CFUNC;
   ret->ptr = p;
   ret->size = 0;
   ret->meta = NULL;
