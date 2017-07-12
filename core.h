@@ -70,6 +70,7 @@ void R_set_bool(R_box *ret, bool v);
 void R_set_str(R_box *ret, char* s);
 void R_set_strcpy(R_box *ret, const char *s);
 void R_set_table(R_box *ret);
+void R_set_table_sized(R_box *ret, uint32_t size);
 void R_set_func(R_box *ret, void *p, int num_args);
 void R_set_cdata(R_box *ret, void *p);
 void R_set_meta(R_box *val, R_box *meta);
