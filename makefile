@@ -1,12 +1,15 @@
 # vim: set noet:
 LIBS=-lgc
 FLAGS=
-EXECS=rain dis
+EXECS=rain dis step
 ARTIFACTS=*.o
 
 all: ${EXECS}
 
 rain: main.o core.o vm.o instr.o table.o
+	clang ${FLAGS} -o $@ ${LIBS} $^
+
+step: step.o core.o vm.o instr.o table.o
 	clang ${FLAGS} -o $@ ${LIBS} $^
 
 dis: dis.o core.o vm.o instr.o table.o
@@ -16,6 +19,9 @@ main.o: main.c
 	clang ${FLAGS} -o $@ -c $^
 
 dis.o: dis.c
+	clang ${FLAGS} -o $@ -c $^
+
+step.o: step.c
 	clang ${FLAGS} -o $@ -c $^
 
 instr.o: instr.c

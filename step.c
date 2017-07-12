@@ -14,7 +14,14 @@ int main(int argv, char **argc) {
   }
 
   vm_import(this, argc[1]);
-  vm_run(this);
+
+  uint32_t i = 0;
+
+  do {
+    printf("% 3d --------\n", i++);
+    vm_dump(this);
+    getchar();
+  } while(vm_step(this));
 
   return 0;
 }
