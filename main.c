@@ -16,12 +16,11 @@ int main(int argv, char **argc) {
   vm_import(this, argc[1]);
 
   uint32_t i = 0;
-  vm_dump(this);
-  printf("% 3d --------\n", i);
 
   do {
+    printf("% 3d --------\n", i++);
     vm_dump(this);
-    printf("% 3d --------\n", ++i);
+    getchar();
   } while(vm_step(this));
 
   return 0;
