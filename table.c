@@ -8,7 +8,7 @@ uint64_t R_hash(R_box *val) {
   switch(val->type) {
     case R_TYPE_BOOL:
       return !!val->u64;
-    case R_TYPE_INT:
+    case R_TYPE_STR:
       for(int i=0; i<val->size; i++) {
         hash += (hash << 5) + val->str[i];
       }
