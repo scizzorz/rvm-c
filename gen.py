@@ -35,20 +35,28 @@ class Box(ct.Structure):
   def to_rain(cls, val):
     if val is None:
       return cls.new(cls.null, 0, 0, cls.nullptr)
+
     elif val is False:
       return cls.new(cls.bool, 0, 0, cls.nullptr)
+
     elif val is True:
       return cls.new(cls.bool, 0, 1, cls.nullptr)
+
     elif isinstance(val, int):
       return cls.new(cls.int, 0, val, cls.nullptr)
+
     elif isinstance(val, float):
       raw = struct.pack('d', val)
       intrep = struct.unpack('Q', raw)[0]
       return cls.new(cls.float, 0, intrep, cls.nullptr)
+
     elif isinstance(val, str):
       idx = len(cls._strings_)
       cls._strings_.append(val)
       return cls.new(cls.str, len(val), idx, cls.nullptr)
+
+    elif isinstance(val, type(lambda: 0)):
+      return cls.new(cls.func, 0, val(), cls.nullptr)
 
     raise Exception("Can't convert value {!r} to Rain".format(val))
 
@@ -87,6 +95,9 @@ class Instr:
   CALLTO     = 0x0E
   RETURN     = 0x0F
   IMPORT     = 0x10
+  CALL       = 0x11
+  SET_META   = 0x12
+  GET_META   = 0x13
 
   def __init__(self):
     pass
@@ -163,6 +174,9 @@ class NOP(Nx): op = Instr.NOP
 class CallTo(UBx): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
 class Import(Nx): op = Instr.IMPORT
+class Call(Nx): op = Instr.CALL
+class SetMeta(Nx): op = Instr.SET_META
+class GetMeta(Nx): op = Instr.GET_META
 
 
 class BinOp(Ux):
@@ -244,11 +258,13 @@ class Module:
     for block in self.blocks:
       block.finalize()
 
+    self.consts = [Box.to_rain(val) for val in self.consts]
+
   def add_const(self, val):
     if self.frozen:
       raise Exception('Module {!r} already finalized'.format(self.name))
 
-    self.consts.append(Box.to_rain(val))
+    self.consts.append(val)
     return len(self.consts) - 1
 
   def add_instr(self, *instrs):
@@ -289,6 +305,15 @@ class Module:
 
   def call_to(self, instr):
     self.add_instr(CallTo(instr))
+
+  def call(self):
+    self.add_instr(Call())
+
+  def set_meta(self):
+    self.add_instr(SetMeta())
+
+  def get_meta(self):
+    self.add_instr(GetMeta())
 
   def ret(self):
     self.add_instr(Return())
