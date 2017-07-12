@@ -3,7 +3,7 @@
 
 #include "rain.h"
 
-#define NUM_INSTRS 0x11
+#define NUM_INSTRS 0x14
 
 #define PUSH_CONST 0x00
 #define PRINT      0x01
@@ -22,6 +22,9 @@
 #define CALLTO     0x0E
 #define RETURN     0x0F
 #define IMPORT     0x10
+#define CALL       0x11
+#define SET_META   0x12
+#define GET_META   0x13
 
 #define CMP_LT     0x00
 #define CMP_LE     0x01
@@ -55,6 +58,9 @@ void R_NOP(R_vm *vm, R_op *instr);
 void R_CALLTO(R_vm *vm, R_op *instr);
 void R_RETURN(R_vm *vm, R_op *instr);
 void R_IMPORT(R_vm *vm, R_op *instr);
+void R_CALL(R_vm *vm, R_op *instr);
+void R_SET_META(R_vm *vm, R_op *instr);
+void R_GET_META(R_vm *vm, R_op *instr);
 
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *);
 

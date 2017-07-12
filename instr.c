@@ -18,6 +18,9 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_CALLTO,
   R_RETURN,
   R_IMPORT,
+  R_CALL,
+  R_SET_META,
+  R_GET_META,
 };
 
 
@@ -39,6 +42,9 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "CALLTO",
   "RETURN",
   "IMPORT",
+  "CALL",
+  "SET_META",
+  "GET_META",
 };
 
 void R_PRINT(R_vm *vm, R_op *instr) {
@@ -224,4 +230,32 @@ void R_IMPORT(R_vm *vm, R_op *instr) {
     vm_import(vm, pop.str);
     vm->instr_ptr -= 1;
   }
+}
+
+void R_CALL(R_vm *vm, R_op *instr) {
+  R_box pop = vm_pop(vm);
+  if(R_TYPE_IS(&pop, FUNC)) {
+    R_box scope;
+
+    if(R_has_meta(&pop)) {
+      R_table_clone(pop.meta, &scope);
+    }
+    else {
+      R_set_table(&scope);
+    }
+
+    vm_call(vm, pop.u64 - 1, &scope);
+  }
+}
+
+void R_SET_META(R_vm *vm, R_op *instr) {
+  R_box pop = vm_pop(vm);
+  R_box *top = &vm->stack[vm->stack_ptr - 1];
+  top->meta = GC_malloc(sizeof(R_box));
+  *(top->meta) = pop;
+}
+
+void R_GET_META(R_vm *vm, R_op *instr) {
+  R_box pop = vm_pop(vm);
+  vm_push(vm, pop.meta);
 }
