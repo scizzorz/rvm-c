@@ -4,3 +4,6 @@ step
 *.o
 *.so
 *.rnc
+*.pyc
+__pycache__
+*.egg-info
