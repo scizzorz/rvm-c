@@ -12,8 +12,10 @@ void R_intrinsic_load(R_vm *vm) {
   if(R_TYPE_IS(&name, STR) && R_TYPE_IS(&lib, STR)) {
     void *handle = dlopen(lib.str, RTLD_LAZY | RTLD_GLOBAL);
     void *func = dlsym(handle, name.str);
-    R_set_cfunc(top, func);
-    return;
+    if(func != NULL) {
+      R_set_cfunc(top, func);
+      return;
+    }
   }
 
   R_set_null(top);
