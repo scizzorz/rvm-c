@@ -200,16 +200,27 @@ void R_SET(R_vm *vm, R_op *instr) {
 
 void R_GET(R_vm *vm, R_op *instr) {
   R_box table = vm_pop(vm);
+  R_box *cur = &table;
   R_box key = vm_top(vm);
   R_box *top = &vm->stack[vm->stack_ptr - 1];
-  R_box *res = R_table_get(&table, &key);
+  R_box *res;
+  while(cur != NULL) {
+    res = R_table_get(cur, &key);
 
-  if(res == NULL) {
-    R_set_null(top);
-    return;
+    if(res != NULL) {
+      *top = *res;
+      return;
+    }
+
+    if(R_has_meta(cur)) {
+      cur = cur->meta;
+      continue;
+    }
+
+    break;
   }
 
-  *top = *res;
+  R_set_null(top);
 }
 
 void R_PUSH_TABLE(R_vm *vm, R_op *instr) {
