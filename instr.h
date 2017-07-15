@@ -3,7 +3,7 @@
 
 #include "rain.h"
 
-#define NUM_INSTRS 0x16
+#define NUM_INSTRS 0x17
 
 #define PUSH_CONST 0x00
 #define PRINT      0x01
@@ -26,7 +26,8 @@
 #define SET_META   0x12
 #define GET_META   0x13
 #define LOAD       0x14
-#define SAVE       0x14
+#define SAVE       0x15
+#define FIT        0x16
 
 #define CMP_LT     0x00
 #define CMP_LE     0x01
@@ -65,6 +66,7 @@ void R_SET_META(R_vm *vm, R_op *instr);
 void R_GET_META(R_vm *vm, R_op *instr);
 void R_LOAD(R_vm *vm, R_op *instr);
 void R_SAVE(R_vm *vm, R_op *instr);
+void R_FIT(R_vm *vm, R_op *instr);
 
 void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *);
 

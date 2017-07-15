@@ -25,6 +25,7 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_GET_META,
   R_LOAD,
   R_SAVE,
+  R_FIT,
 };
 
 
@@ -51,6 +52,7 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "GET_META",
   "LOAD",
   "SAVE",
+  "FIT",
 };
 
 void R_PRINT(R_vm *vm, R_op *instr) {
@@ -311,4 +313,8 @@ void R_LOAD(R_vm *vm, R_op *instr) {
 void R_SAVE(R_vm *vm, R_op *instr) {
   R_box pop = vm_pop(vm);
   vm->frame->ret = pop;
+}
+
+void R_FIT(R_vm *vm, R_op *instr) {
+  vm_fit(vm, R_UI(instr));
 }

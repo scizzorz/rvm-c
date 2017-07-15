@@ -100,6 +100,7 @@ class Instr:
   GET_META   = 0x13
   LOAD       = 0x14
   SAVE       = 0x15
+  FIT        = 0x16
 
   def __init__(self):
     pass
@@ -181,6 +182,7 @@ class SetMeta(Nx): op = Instr.SET_META
 class GetMeta(Nx): op = Instr.GET_META
 class Load(Nx): op = Instr.LOAD
 class Save(Nx): op = Instr.SAVE
+class Fit(Ux): op = Instr.FIT
 
 
 class BinOp(Ux):
@@ -330,6 +332,9 @@ class Module:
 
   def save(self):
     self.add_instr(Save())
+
+  def fit(self, argc):
+    self.add_instr(Fit(argc))
 
   def imp(self):
     self.add_instr(Import())
