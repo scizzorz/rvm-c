@@ -28,7 +28,7 @@ void R_builtin_print(R_vm *vm) {
 void R_builtin_scope(R_vm *vm) {
   // push frame -2 scope because we don't want to push this function call's
   // scope, we want its outer scope
-  vm_save(vm, &vm->frame->scope);
+  vm_save(vm, &vm->frames[vm->frame_ptr - 2].scope);
 }
 
 void R_builtin_meta(R_vm *vm) {
