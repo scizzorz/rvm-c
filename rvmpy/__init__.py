@@ -184,10 +184,10 @@ class Load(Nx): op = Instr.LOAD
 class BinOp(Ux):
   op = Instr.BIN_OP
 
-  BIN_ADD    = 0x00
-  BIN_SUB    = 0x01
-  BIN_MUL    = 0x02
-  BIN_DIV    = 0x03
+  ADD    = 0x00
+  SUB    = 0x01
+  MUL    = 0x02
+  DIV    = 0x03
 
 
 class UnOp(Ux):
@@ -197,15 +197,15 @@ class UnOp(Ux):
   UN_NOT     = 0x01
 
 
-class Cmp(Ux):
+class CmpOp(Ux):
   op = Instr.CMP
 
-  CMP_LT     = 0x00
-  CMP_LE     = 0x01
-  CMP_GT     = 0x02
-  CMP_GE     = 0x03
-  CMP_EQ     = 0x04
-  CMP_NE     = 0x05
+  LT     = 0x00
+  LE     = 0x01
+  GT     = 0x02
+  GE     = 0x03
+  EQ     = 0x04
+  NE     = 0x05
 
 
 class Block:
@@ -330,16 +330,34 @@ class Module:
     self.add_instr(Import())
 
   def add(self):
-    self.add_instr(BinOp(BinOp.BIN_ADD))
+    self.add_instr(BinOp(BinOp.ADD))
 
   def sub(self):
-    self.add_instr(BinOp(BinOp.BIN_SUB))
+    self.add_instr(BinOp(BinOp.SUB))
 
   def mul(self):
-    self.add_instr(BinOp(BinOp.BIN_MUL))
+    self.add_instr(BinOp(BinOp.MUL))
 
   def div(self):
-    self.add_instr(BinOp(BinOp.BIN_DIV))
+    self.add_instr(BinOp(BinOp.DIV))
+
+  def lt(self):
+    self.add_instr(CmpOp(CmpOp.LT))
+
+  def le(self):
+    self.add_instr(CmpOp(CmpOp.LE))
+
+  def gt(self):
+    self.add_instr(CmpOp(CmpOp.GT))
+
+  def ge(self):
+    self.add_instr(CmpOp(CmpOp.GE))
+
+  def eq(self):
+    self.add_instr(CmpOp(CmpOp.EQ))
+
+  def ne(self):
+    self.add_instr(CmpOp(CmpOp.NE))
 
   def nop(self):
     self.add_instr(NOP())
