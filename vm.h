@@ -38,6 +38,7 @@ typedef struct R_vm {
   R_op *instrs;
   R_box *stack;
   R_frame *frames;
+  R_frame *frame;
 } R_vm;
 
 R_vm *vm_new();

@@ -24,6 +24,7 @@ void (*R_INSTR_TABLE[NUM_INSTRS])(R_vm *, R_op *) = {
   R_SET_META,
   R_GET_META,
   R_LOAD,
+  R_SAVE,
 };
 
 
@@ -49,6 +50,7 @@ const char *R_INSTR_NAMES[NUM_INSTRS] = {
   "SET_META",
   "GET_META",
   "LOAD",
+  "SAVE",
 };
 
 void R_PRINT(R_vm *vm, R_op *instr) {
@@ -304,4 +306,9 @@ void R_LOAD(R_vm *vm, R_op *instr) {
   }
 
   R_set_null(top);
+}
+
+void R_SAVE(R_vm *vm, R_op *instr) {
+  R_box pop = vm_pop(vm);
+  vm->frame->ret = pop;
 }

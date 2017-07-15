@@ -6,7 +6,7 @@
 void R_builtin_load(R_vm *vm) {
   R_box name = vm_pop(vm);
   R_box lib = vm_pop(vm);
-  R_box *ret = &vm->frames[vm->frame_ptr - 1].ret;
+  R_box *ret = &vm->frame->ret;
 
   if(R_TYPE_IS(&name, STR) && R_TYPE_IS(&lib, STR)) {
     void *handle = dlopen(lib.str, RTLD_LAZY | RTLD_GLOBAL);
@@ -28,12 +28,12 @@ void R_builtin_print(R_vm *vm) {
 void R_builtin_scope(R_vm *vm) {
   // push frame -2 scope because we don't want to push this function call's
   // scope, we want its outer scope
-  vm_save(vm, &vm->frames[vm->frame_ptr - 2].scope);
+  vm_save(vm, &vm->frame->scope);
 }
 
 void R_builtin_meta(R_vm *vm) {
   R_box pop = vm_pop(vm);
-  R_box *ret = &vm->frames[vm->frame_ptr - 1].ret;
+  R_box *ret = &vm->frame->ret;
   if(R_has_meta(&pop)) {
     *ret = *(pop.meta);
   }

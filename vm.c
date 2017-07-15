@@ -251,16 +251,17 @@ R_box *vm_push(R_vm *this, R_box *val) {
 }
 
 void vm_call(R_vm *this, uint32_t to, R_box *scope, uint32_t argc) {
-  this->frames[this->frame_ptr].return_to = this->instr_ptr;
-  this->frames[this->frame_ptr].argc = argc;
-  this->frames[this->frame_ptr].base_ptr = this->stack_ptr - argc;
-  R_set_null(&this->frames[this->frame_ptr].ret);
+  this->frame = &this->frames[this->frame_ptr];
+  this->frame->return_to = this->instr_ptr;
+  this->frame->argc = argc;
+  this->frame->base_ptr = this->stack_ptr - argc;
+  R_set_null(&this->frame->ret);
 
   if(scope == NULL) {
-    R_set_table(&this->frames[this->frame_ptr].scope);
+    R_set_table(&this->frame->scope);
   }
   else {
-    this->frames[this->frame_ptr].scope = *scope;
+    this->frame->scope = *scope;
   }
 
   this->frame_ptr += 1;
@@ -268,12 +269,14 @@ void vm_call(R_vm *this, uint32_t to, R_box *scope, uint32_t argc) {
 }
 
 void vm_ret(R_vm *this) {
+  this->instr_ptr = this->frame->return_to;
+  this->stack_ptr = this->frame->base_ptr;
+  vm_push(this, &this->frame->ret);
+
   this->frame_ptr -= 1;
-  this->instr_ptr = this->frames[this->frame_ptr].return_to;
-  this->stack_ptr = this->frames[this->frame_ptr].base_ptr;
-  vm_push(this, &this->frames[this->frame_ptr].ret);
+  this->frame = &this->frames[this->frame_ptr - 1];
 }
 
 void vm_save(R_vm *this, R_box *val) {
-  this->frames[this->frame_ptr - 1].ret = *val;
+  this->frame->ret = *val;
 }
