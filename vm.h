@@ -56,5 +56,6 @@ void vm_set(R_vm *this, R_box *val);
 void vm_call(R_vm *this, uint32_t to, R_box *scope, uint32_t argc);
 void vm_ret(R_vm *this);
 void vm_save(R_vm *this, R_box *val);
+void vm_fit(R_vm *this, uint32_t want);
 
 #endif

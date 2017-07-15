@@ -280,3 +280,19 @@ void vm_ret(R_vm *this) {
 void vm_save(R_vm *this, R_box *val) {
   this->frame->ret = *val;
 }
+
+void vm_fit(R_vm *this, uint32_t want) {
+  uint32_t have = this->frame->argc;
+  R_box null;
+  R_set_null(&null);
+
+  while(have < want) {
+    vm_push(this, &null);
+    have += 1;
+  }
+
+  while(have > want) {
+    vm_pop(this);
+    have -= 1;
+  }
+}
