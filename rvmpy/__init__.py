@@ -175,7 +175,7 @@ class NOP(Nx): op = Instr.NOP
 class CallTo(UBx): op = Instr.CALLTO
 class Return(Nx): op = Instr.RETURN
 class Import(Nx): op = Instr.IMPORT
-class Call(Nx): op = Instr.CALL
+class Call(Ux): op = Instr.CALL
 class SetMeta(Nx): op = Instr.SET_META
 class GetMeta(Nx): op = Instr.GET_META
 class Load(Nx): op = Instr.LOAD
@@ -311,8 +311,8 @@ class Module:
   def call_to(self, instr):
     self.add_instr(CallTo(instr))
 
-  def call(self):
-    self.add_instr(Call())
+  def call(self, argc):
+    self.add_instr(Call(argc))
 
   def set_meta(self):
     self.add_instr(SetMeta())

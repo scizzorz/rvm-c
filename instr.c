@@ -232,7 +232,7 @@ void R_NOP(R_vm *vm, R_op *instr) {
 }
 
 void R_CALLTO(R_vm *vm, R_op *instr) {
-  vm_call(vm, R_UI(instr) - 1, NULL);
+  vm_call(vm, R_UI(instr) - 1, NULL, 0);
 }
 
 void R_RETURN(R_vm *vm, R_op *instr) {
@@ -259,7 +259,7 @@ void R_CALL(R_vm *vm, R_op *instr) {
       R_set_table(&scope);
     }
 
-    vm_call(vm, pop.u64 - 1, &scope);
+    vm_call(vm, pop.u64 - 1, &scope, R_UI(instr));
   }
 
   else if(R_TYPE_IS(&pop, CFUNC)) {
@@ -270,7 +270,7 @@ void R_CALL(R_vm *vm, R_op *instr) {
       R_set_table(&scope);
     }
 
-    vm_call(vm, vm->instr_ptr, &scope);
+    vm_call(vm, vm->instr_ptr, &scope, R_UI(instr));
 
     void (*fn)(R_vm *) = (void (*)(R_vm *))pop.ptr;
     fn(vm);

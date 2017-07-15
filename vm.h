@@ -12,7 +12,10 @@ typedef struct R_header {
 
 typedef struct R_frame {
   uint32_t return_to;
+  uint32_t base_ptr;
+  uint32_t argc;
   R_box scope;
+  R_box ret;
 } R_frame;
 
 typedef struct R_vm {
@@ -49,7 +52,8 @@ R_box vm_top(R_vm *this);
 R_box *vm_push(R_vm *this, R_box *val);
 R_box *vm_alloc(R_vm *this);
 void vm_set(R_vm *this, R_box *val);
-void vm_call(R_vm *this, uint32_t to, R_box *scope);
+void vm_call(R_vm *this, uint32_t to, R_box *scope, uint32_t argc);
 void vm_ret(R_vm *this);
+void vm_save(R_vm *this, R_box *val);
 
 #endif

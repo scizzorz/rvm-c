@@ -135,6 +135,7 @@ void R_op_print(R_op *instr) {
     case BIN_OP:
     case UN_OP:
     case CMP:
+    case CALL:
       printf("%s (%d)\n", R_INSTR_NAMES[R_OP(instr)], R_UI(instr));
       break;
     case JUMP:
