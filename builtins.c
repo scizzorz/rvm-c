@@ -21,8 +21,12 @@ void R_builtin_load(R_vm *vm) {
 }
 
 void R_builtin_print(R_vm *vm) {
-  R_box pop = vm_pop(vm);
-  R_box_print(&pop);
+  uint32_t args = vm->frame->argc;
+  while(args > 0) {
+    R_box pop = vm_pop(vm);
+    R_box_print(&pop);
+    args -= 1;
+  }
 }
 
 void R_builtin_scope(R_vm *vm) {
