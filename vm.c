@@ -54,6 +54,18 @@ bool vm_import(R_vm *this, const char *fname) {
   R_set_cfunc(&val, R_builtin_load);
   R_table_set(&builtins, &key, &val);
 
+  R_set_str(&key, "print");
+  R_set_cfunc(&val, R_builtin_print);
+  R_table_set(&builtins, &key, &val);
+
+  R_set_str(&key, "meta");
+  R_set_cfunc(&val, R_builtin_meta);
+  R_table_set(&builtins, &key, &val);
+
+  R_set_str(&key, "scope");
+  R_set_cfunc(&val, R_builtin_scope);
+  R_table_set(&builtins, &key, &val);
+
   vm_call(this, next_instr, &builtins, 0);
   return true;
 }
