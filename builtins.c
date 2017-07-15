@@ -24,3 +24,19 @@ void R_builtin_print(R_vm *vm) {
   R_box pop = vm_pop(vm);
   R_box_print(&pop);
 }
+
+void R_builtin_scope(R_vm *vm) {
+  // push frame -2 scope because we don't want to push this function call's
+  // scope, we want its outer scope
+  vm_push(vm, &vm->frames[vm->frame_ptr - 2].scope);
+}
+
+void R_builtin_meta(R_vm *vm) {
+  R_box *top = &vm->stack[vm->stack_ptr - 1];
+  if(R_has_meta(top)) {
+    *top = *(top->meta);
+  }
+  else {
+    R_set_null(top);
+  }
+}
