@@ -69,8 +69,8 @@ void R_UN_OP(R_vm *vm, R_op *instr) {
 }
 
 void R_BIN_OP(R_vm *vm, R_op *instr) {
-  R_box lhs = vm_pop(vm);
-  R_box rhs = vm_top(vm);
+  R_box rhs = vm_pop(vm);
+  R_box lhs = vm_top(vm);
   R_box *top = &vm->stack[vm->stack_ptr - 1];
   bool do_float = false;
   double lhs_f, rhs_f;
@@ -114,8 +114,8 @@ void R_BIN_OP(R_vm *vm, R_op *instr) {
 }
 
 void R_CMP(R_vm *vm, R_op *instr) {
-  R_box lhs = vm_pop(vm);
-  R_box rhs = vm_top(vm);
+  R_box rhs = vm_pop(vm);
+  R_box lhs = vm_top(vm);
   R_box *top = &vm->stack[vm->stack_ptr - 1];
 
   if(lhs.type != rhs.type) {
