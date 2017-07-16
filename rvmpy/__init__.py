@@ -395,6 +395,12 @@ class Module:
     self.blocks.append(block)
     return block
 
+  def ins_block(self):
+    block = Block()
+    pos = self.blocks.index(self.block) + 1
+    self.blocks.insert(pos, block)
+    return block
+
   @ctx
   def goto(self, block):
     temp = self.block
