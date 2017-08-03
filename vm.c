@@ -38,7 +38,7 @@ bool vm_import(R_vm *this, const char *fname) {
     return false;
   }
 
-  uint32_t next_instr = this->num_instrs;
+  uint32_t module_start = this->num_instrs;
   if(!vm_load(this, fp)) {
     fprintf(stderr, "Unable to load bytecode\n");
     fclose(fp);
@@ -66,7 +66,11 @@ bool vm_import(R_vm *this, const char *fname) {
   R_set_cfunc(&val, R_builtin_scope);
   R_table_set(&builtins, &key, &val);
 
-  vm_call(this, next_instr, &builtins, 0);
+  R_set_str(&key, "import");
+  R_set_cfunc(&val, R_builtin_import);
+  R_table_set(&builtins, &key, &val);
+
+  vm_call(this, module_start, &builtins, 0);
   return true;
 }
 

@@ -22,6 +22,8 @@ void R_builtin_load(R_vm *vm) {
 
 void R_builtin_print(R_vm *vm) {
   uint32_t args = vm->frame->argc;
+
+  // varargs!
   while(args > 0) {
     R_box pop = vm_pop(vm);
     R_box_print(&pop);
@@ -43,5 +45,19 @@ void R_builtin_meta(R_vm *vm) {
   }
   else {
     R_set_null(ret);
+  }
+}
+
+void R_builtin_import(R_vm *vm) {
+  R_box pop = vm_pop(vm);
+  printf("importing: ");
+  R_box_print(&pop);
+  if(R_TYPE_IS(&pop, STR)) {
+    uint32_t module_start = vm->num_instrs;
+    vm_import(vm, pop.str);
+    R_frame top = *vm->frame;
+    *vm->frame = vm->frames[vm->frame_ptr - 2];
+    vm->frames[vm->frame_ptr - 2] = top;
+    vm->frame->return_to = module_start - 1;
   }
 }
